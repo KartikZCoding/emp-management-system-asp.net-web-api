@@ -2,7 +2,7 @@
 
 namespace EmpMS.DTOs.Auth
 {
-    public class RegisterDTO
+    public class RegisterDto
     {
         [Required(ErrorMessage = "please enter a username!")]
         public string Username { get; set; }
