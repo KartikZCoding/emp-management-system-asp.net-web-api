@@ -4,8 +4,10 @@ namespace EmpMS.Repositories
 {
     public interface IRolePrivilegeRepository
     {
-        Task AssignPrivilegeToRoleAsync(RolePrivilege rolePrivilege);
-        Task RemoveRolePrivilegeAsync(int id);
-        Task<List<RolePrivilege>> GetPrivilegesByRoleIdAsync(int roleId);
+        Task AddRolePrivilegeAsync(RolePrivilege rolePrivilege);
+        Task DeleteRolePrivilegeAsync(RolePrivilege rolePrivilege);
+        Task<List<Privilege>> GetPrivilegesByRoleIdAsync(int roleId);
+        Task<RolePrivilege> GetRolePrivilegeAsync(int roleId, int privilegeId);
+        Task<bool> RolePrivilegeExistsAsync(int roleId, int privilegeId);
     }
 }

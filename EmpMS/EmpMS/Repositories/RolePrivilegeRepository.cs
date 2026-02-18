@@ -13,20 +13,35 @@ namespace EmpMS.Repositories
             _appDbContext = appDbContext;
         }
 
-        public async Task AssignPrivilegeToRoleAsync(RolePrivilege rolePrivilege)
+        public async Task AddRolePrivilegeAsync(RolePrivilege rolePrivilege)
         {
             await _appDbContext.RolePrivileges.AddAsync(rolePrivilege);
             await _appDbContext.SaveChangesAsync();
         }
 
-        public async Task<List<RolePrivilege>> GetPrivilegesByRoleIdAsync(int roleId)
+        public async Task<List<Privilege>> GetPrivilegesByRoleIdAsync(int roleId)
         {
-            return await _appDbContext.RolePrivileges.Include(rp => rp.Privilege).Where(rp => rp.RoleId == roleId).ToListAsync();
+            return await _appDbContext.RolePrivileges
+                .Include(rp => rp.Privilege)
+                .Where(rp => rp.RoleId == roleId)
+                .Select(rp => rp.Privilege)
+                .ToListAsync();
         }
 
-        public async Task RemoveRolePrivilegeAsync(int id)
+        public async Task<RolePrivilege> GetRolePrivilegeAsync(int roleId, int privilegeId)
         {
-            var rolePrivilege = await _appDbContext.RolePrivileges.Where(rp => rp.Id == id).FirstOrDefaultAsync();
+            return await _appDbContext.RolePrivileges
+                .FirstOrDefaultAsync(rp => rp.RoleId == roleId && rp.PrivilegeId == privilegeId);
+        }
+
+        public async Task<bool> RolePrivilegeExistsAsync(int roleId, int privilegeId)
+        {
+            return await _appDbContext.RolePrivileges
+                .AnyAsync(rp => rp.RoleId == roleId && rp.PrivilegeId == privilegeId);
+        }
+
+        public async Task DeleteRolePrivilegeAsync(RolePrivilege rolePrivilege)
+        {
             _appDbContext.RolePrivileges.Remove(rolePrivilege);
             await _appDbContext.SaveChangesAsync();
         }
