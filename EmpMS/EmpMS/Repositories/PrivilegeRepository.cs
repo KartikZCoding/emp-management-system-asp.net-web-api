@@ -23,5 +23,27 @@ namespace EmpMS.Repositories
         {
             return await _appDbContext.Privileges.ToListAsync();
         }
+
+        public async Task<Privilege> GetPrivilegeByIdAsync(int id)
+        {
+            return await _appDbContext.Privileges.FindAsync(id);
+        }
+
+        public async Task<bool> PrivilegeExistsAsync(string name)
+        {
+            return await _appDbContext.Privileges.AnyAsync(p => p.PrivilegeName == name);
+        }
+
+        public async Task UpdatePrivilegeAsync(Privilege privilege)
+        {
+            _appDbContext.Privileges.Update(privilege);
+            await _appDbContext.SaveChangesAsync();
+        }
+
+        public async Task DeletePrivilegeAsync(Privilege privilege)
+        {
+            _appDbContext.Privileges.Remove(privilege);
+            await _appDbContext.SaveChangesAsync();
+        }
     }
 }
