@@ -1,10 +1,13 @@
 using EmpMS.Data;
+using EmpMS.Helpers;
 using EmpMS.Repositories;
 using EmpMS.Services;
-using EmpMS.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
+using System.Net;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,9 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi();
 
 // all registration here of any services
 //**************************************************************************************************
@@ -59,6 +60,29 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+/*for errors handling*/
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(x => x.Value.Errors.Count > 0)
+                .SelectMany(x => x.Value.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+
+            var response = new APIResponse
+            {
+                Status = false,
+                StatusCode = HttpStatusCode.BadRequest,
+                Errors = errors
+            };
+
+            return new BadRequestObjectResult(response);
+        };
+    });
+
 //**************************************************************************************************
 
 var app = builder.Build();
@@ -66,8 +90,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
