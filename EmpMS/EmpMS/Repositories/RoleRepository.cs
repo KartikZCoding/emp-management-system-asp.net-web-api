@@ -43,9 +43,8 @@ namespace EmpMS.Repositories
             await _appDbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteRoleAsync(int id)
+        public async Task DeleteRoleAsync(Role role)
         {
-            var role = await _appDbContext.Roles.Where(u => u.Id == id).FirstOrDefaultAsync();
             _appDbContext.Roles.Remove(role);
             await _appDbContext.SaveChangesAsync();
         }

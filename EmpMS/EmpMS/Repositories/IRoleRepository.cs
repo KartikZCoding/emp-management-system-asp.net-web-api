@@ -10,6 +10,6 @@ namespace EmpMS.Repositories
         Task<Role?> GetRoleByIdAsync(int id);
         Task<Role?> GetRoleByNameAsync(string roleName);
         Task UpdateRoleAsync(Role role);
-        Task DeleteRoleAsync(int id);
+        Task DeleteRoleAsync(Role role);
     }
 }
