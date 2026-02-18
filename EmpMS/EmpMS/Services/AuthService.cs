@@ -25,7 +25,7 @@ namespace EmpMS.Services
             if (user == null)
                 throw new Exception("User not found!");
 
-            bool isOldPasswordValid  = BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash);
+            bool isOldPasswordValid = BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash);
             if (!isOldPasswordValid)
                 throw new Exception("Old password is incorrect");
 
@@ -50,7 +50,7 @@ namespace EmpMS.Services
                 throw new Exception("User has no role assigned!");
             var role = userRole.Role;
 
-            string token = _jwtHelper.GenerateToken(user.Id, user.Username, role);
+            string token = _jwtHelper.GenerateToken(user.Id, user.Username, role.RoleName);
 
             var loginResponse = new LoginResponseDto
             {

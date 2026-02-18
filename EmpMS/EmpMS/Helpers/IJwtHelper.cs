@@ -4,6 +4,6 @@ namespace EmpMS.Helpers
 {
     public interface IJwtHelper
     {
-        string GenerateToken(int userId, string username, Role role);
+        string GenerateToken(int userId, string username, string rolename);
     }
 }

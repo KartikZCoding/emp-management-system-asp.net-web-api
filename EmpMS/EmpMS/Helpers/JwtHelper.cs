@@ -16,7 +16,7 @@ namespace EmpMS.Helpers
             _configuration = configuration;
         }
 
-        public string GenerateToken(int userId, string username, Role role)
+        public string GenerateToken(int userId, string username, string rolename)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
@@ -25,7 +25,7 @@ namespace EmpMS.Helpers
             {
                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
                new Claim(ClaimTypes.Name, username),
-               new Claim(ClaimTypes.Role, role.RoleName),
+               new Claim(ClaimTypes.Role, rolename),
             };
 
             var token = new JwtSecurityToken(
