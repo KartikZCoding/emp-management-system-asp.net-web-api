@@ -3,11 +3,9 @@ using EmpMS.Helpers;
 using EmpMS.Repositories;
 using EmpMS.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
-using System.Net;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,7 +59,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 /*for errors handling*/
-builder.Services.AddControllers()
+/*builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options =>
     {
         options.InvalidModelStateResponseFactory = context =>
@@ -81,7 +79,7 @@ builder.Services.AddControllers()
 
             return new BadRequestObjectResult(response);
         };
-    });
+    });*/
 
 //**************************************************************************************************
 
