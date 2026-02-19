@@ -19,49 +19,6 @@ namespace EmpMS.Services
             _jwtHelper = jwtHelper;
         }
 
-        public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
-        {
-            var user = await _authRepository.GetUserByIdAsync(userId);
-            if (user == null)
-                throw new Exception("User not found!");
-
-            bool isOldPasswordValid = BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash);
-            if (!isOldPasswordValid)
-                throw new Exception("Old password is incorrect");
-
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-
-            await _authRepository.UpdateUserAsync(user);
-
-        }
-
-        public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
-        {
-            var user = await _authRepository.GetUserByUsernameAsync(dto.Username);
-            if (user == null)
-                throw new Exception("User not found!");
-
-            bool verifyPassword = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
-            if (!verifyPassword)
-                throw new Exception("Invalid password!");
-
-            var userRole = user.UserRoles.FirstOrDefault();
-            if (userRole == null)
-                throw new Exception("User has no role assigned!");
-            var role = userRole.Role;
-
-            string token = _jwtHelper.GenerateToken(user.Id, user.Username, role.RoleName);
-
-            var loginResponse = new LoginResponseDto
-            {
-                Username = user.Username,
-                Token = token,
-                Role = role.RoleName
-            };
-
-            return loginResponse;
-        }
-
         public async Task RegisterAsync(RegisterDto dto)
         {
             if (await _authRepository.UserExistAsync(dto.Username))
@@ -91,5 +48,75 @@ namespace EmpMS.Services
 
             await _authRepository.AddUserRoleAsync(userRole);
         }
+
+        public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
+        {
+            var user = await _authRepository.GetUserByUsernameAsync(dto.Username);
+            if (user == null)
+                throw new Exception("User not found!");
+
+            bool verifyPassword = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
+            if (!verifyPassword)
+                throw new Exception("Invalid password!");
+
+            var userRole = user.UserRoles.FirstOrDefault();
+            if (userRole == null)
+                throw new Exception("User has no role assigned!");
+            var role = userRole.Role;
+
+            string token = _jwtHelper.GenerateToken(user.Id, user.Username, role.RoleName);
+
+            var loginResponse = new LoginResponseDto
+            {
+                Username = user.Username,
+                Token = token,
+                Role = role.RoleName
+            };
+
+            return loginResponse;
+        }
+
+        public async Task UserResetPasswordAsync(int userId, ResetPassUserDto dto)
+        {
+            if (string.IsNullOrEmpty(dto.NewPassword)) throw new Exception("please enter a new password!");
+
+            var user = await _authRepository.GetUserByIdAsync(userId);
+            if (user == null)
+                throw new Exception("User not found!");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+            await _authRepository.UpdateUserAsync(user);
+        }
+
+        public async Task AdminResetPasswordAsync(ResetPassAdminDto dto)
+        {
+            if (string.IsNullOrEmpty(dto.NewPassword)) throw new Exception("please enter a new password!");
+
+            var user = await _authRepository.GetUserByIdAsync(dto.UserId);
+            if (user == null)
+                throw new Exception("User not found!");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+            await _authRepository.UpdateUserAsync(user);
+        }
+
+        public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
+        {
+            var user = await _authRepository.GetUserByIdAsync(userId);
+            if (user == null)
+                throw new Exception("User not found!");
+
+            bool isOldPasswordValid = BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash);
+            if (!isOldPasswordValid)
+                throw new Exception("Old password is incorrect");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+            await _authRepository.UpdateUserAsync(user);
+
+        }
+
     }
 }

@@ -54,6 +54,9 @@ namespace EmpMS.Services
             var privilege = await _privilegeRepository.GetPrivilegeByIdAsync(id);
             if (privilege == null) throw new Exception("Privilege not found");
 
+            if (await _privilegeRepository.PrivilegeExistsAsync(dto.PrivilegeName))
+                throw new Exception("Privilege name already exists!");
+
             privilege.PrivilegeName = dto.PrivilegeName;
             privilege.Description = dto.Description;
 

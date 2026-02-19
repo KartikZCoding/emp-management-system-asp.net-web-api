@@ -45,7 +45,11 @@ namespace EmpMS.Services
 
         public async Task<List<PrivilegeDto>> GetPrivilegesByRoleIdAsync(int roleId)
         {
+            if (roleId <= 0) throw new Exception("Please enter a valid role id!");
+
             var privileges = await _repository.GetPrivilegesByRoleIdAsync(roleId);
+            if (privileges.Count == 0) throw new Exception("Privileges not found!");
+
             return privileges.Select(p => new PrivilegeDto
             {
                 PrivilegeName = p.PrivilegeName,
@@ -55,6 +59,9 @@ namespace EmpMS.Services
 
         public async Task RemovePrivilegeFromRoleAsync(int roleId, int privilegeId)
         {
+            if (roleId <= 0) throw new Exception("Please enter a valid role id!");
+            if (privilegeId <= 0) throw new Exception("Please enter a valid privilege id!");
+
             var rolePrivilege = await _repository.GetRolePrivilegeAsync(roleId, privilegeId);
             if (rolePrivilege == null) throw new Exception("Role-Privilege link not found");
 
