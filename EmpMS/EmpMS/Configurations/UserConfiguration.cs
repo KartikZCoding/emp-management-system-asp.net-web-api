@@ -23,6 +23,15 @@ namespace EmpMS.Configurations
             builder.Property(u => u.IsActive).HasDefaultValue(true);
             builder.Property(u => u.CreatedAt).HasDefaultValueSql("GETDATE()");
 
+            builder.HasData(new User
+            {
+                Id = 1,
+                Username = "Admin",
+                Email = "Admin123@gmail.com",
+                PasswordHash = "$2a$11$3TiXqeZZ1dUHslmgkYVDUusIDqGmV3Yv/E7n2iAhNI46Gvq20aAFy",
+                IsActive = true,
+                //CreatedAt = DateTime.Now
+            });
         }
     }
 }

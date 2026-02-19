@@ -29,6 +29,13 @@ namespace EmpMS.Configurations
             // Unique composite index (UserId + RoleId)
             builder.HasIndex(ur => new { ur.UserId, ur.RoleId })
                    .IsUnique();
+
+            builder.HasData(new UserRole
+            {
+                Id = 1,
+                UserId = 1,
+                RoleId = 1,
+            });
         }
     }
 }
