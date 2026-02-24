@@ -1,4 +1,4 @@
-﻿namespace EmpMS.Exceptionss
+﻿namespace EmpMS.Exceptions
 {
     public class NotFoundException : Exception
     {
