@@ -1,3 +1,4 @@
+using EmpMS.Middleware;
 using EmpMS.Data;
 using EmpMS.Helpers;
 using EmpMS.Repositories;
@@ -5,7 +6,6 @@ using EmpMS.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
 using System.Text;
 
@@ -115,6 +115,8 @@ builder.Services.AddAuthentication(options =>
 //**************************************************************************************************
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
