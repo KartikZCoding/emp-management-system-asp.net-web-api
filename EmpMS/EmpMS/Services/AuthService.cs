@@ -1,4 +1,5 @@
-﻿using BCrypt.Net;
+﻿using EmpMS.Exceptions;
+using BCrypt.Net;
 using EmpMS.DTOs.Auth;
 using EmpMS.Helpers;
 using EmpMS.Models;
@@ -22,7 +23,7 @@ namespace EmpMS.Services
         public async Task RegisterAsync(RegisterDto dto)
         {
             if (await _authRepository.UserExistAsync(dto.Username))
-                throw new Exception("User already exists!");
+                throw new BadRequestException("User already exists!");
 
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
@@ -39,7 +40,7 @@ namespace EmpMS.Services
 
             // 5. Assign Default Role "Employee"
             var role = await _roleRepository.GetRoleByNameAsync("Employee");
-            if (role == null) throw new Exception("Default role 'Employee' not found.");
+            if (role == null) throw new NotFoundException("Default role 'Employee' not found.");
             var userRole = new UserRole
             {
                 UserId = user.Id,
@@ -53,15 +54,15 @@ namespace EmpMS.Services
         {
             var user = await _authRepository.GetUserByUsernameAsync(dto.Username);
             if (user == null)
-                throw new Exception("User not found!");
+                throw new BadRequestException("User not found!");
 
             bool verifyPassword = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
             if (!verifyPassword)
-                throw new Exception("Invalid password!");
+                throw new UnauthorizedException("Invalid password!");
 
             var userRole = user.UserRoles.FirstOrDefault();
             if (userRole == null)
-                throw new Exception("User has no role assigned!");
+                throw new UnauthorizedException("User has no role assigned!");
             var role = userRole.Role;
 
             string token = _jwtHelper.GenerateToken(user.Id, user.Username, role.RoleName);
@@ -78,11 +79,11 @@ namespace EmpMS.Services
 
         public async Task UserResetPasswordAsync(int userId, ResetPassUserDto dto)
         {
-            if (string.IsNullOrEmpty(dto.NewPassword)) throw new Exception("please enter a new password!");
+            if (string.IsNullOrEmpty(dto.NewPassword)) throw new BadRequestException("please enter a new password!");
 
             var user = await _authRepository.GetUserByIdAsync(userId);
             if (user == null)
-                throw new Exception("User not found!");
+                throw new NotFoundException("User not found!");
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
 
@@ -91,11 +92,11 @@ namespace EmpMS.Services
 
         public async Task AdminResetPasswordAsync(ResetPassAdminDto dto)
         {
-            if (string.IsNullOrEmpty(dto.NewPassword)) throw new Exception("please enter a new password!");
+            if (string.IsNullOrEmpty(dto.NewPassword)) throw new BadRequestException("please enter a new password!");
 
             var user = await _authRepository.GetUserByIdAsync(dto.UserId);
             if (user == null)
-                throw new Exception("User not found!");
+                throw new NotFoundException("User not found!");
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
 
@@ -106,11 +107,11 @@ namespace EmpMS.Services
         {
             var user = await _authRepository.GetUserByIdAsync(userId);
             if (user == null)
-                throw new Exception("User not found!");
+                throw new NotFoundException("User not found!");
 
             bool isOldPasswordValid = BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash);
             if (!isOldPasswordValid)
-                throw new Exception("Old password is incorrect");
+                throw new BadRequestException("Old password is incorrect");
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
 

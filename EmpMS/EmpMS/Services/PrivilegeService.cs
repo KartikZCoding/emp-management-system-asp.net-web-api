@@ -1,3 +1,4 @@
+using EmpMS.Exceptions;
 using EmpMS.DTOs.Auth;
 using EmpMS.Models;
 using EmpMS.Repositories;
@@ -26,7 +27,7 @@ namespace EmpMS.Services
         public async Task<PrivilegeDto> GetPrivilegeByIdAsync(int id)
         {
             var privilege = await _privilegeRepository.GetPrivilegeByIdAsync(id);
-            if (privilege == null) throw new Exception("Privilege not found");
+            if (privilege == null) throw new NotFoundException("Privilege not found");
 
             return new PrivilegeDto
             {
@@ -38,7 +39,7 @@ namespace EmpMS.Services
         public async Task CreatePrivilegeAsync(PrivilegeDto dto)
         {
             if (await _privilegeRepository.PrivilegeExistsAsync(dto.PrivilegeName))
-                throw new Exception("Privilege already exists");
+                throw new BadRequestException("Privilege already exists");
 
             var privilege = new Privilege
             {
@@ -52,10 +53,10 @@ namespace EmpMS.Services
         public async Task UpdatePrivilegeAsync(int id, PrivilegeDto dto)
         {
             var privilege = await _privilegeRepository.GetPrivilegeByIdAsync(id);
-            if (privilege == null) throw new Exception("Privilege not found");
+            if (privilege == null) throw new NotFoundException("Privilege not found");
 
             if (await _privilegeRepository.PrivilegeExistsAsync(dto.PrivilegeName))
-                throw new Exception("Privilege name already exists!");
+                throw new BadRequestException("Privilege name already exists!");
 
             privilege.PrivilegeName = dto.PrivilegeName;
             privilege.Description = dto.Description;
@@ -66,7 +67,7 @@ namespace EmpMS.Services
         public async Task DeletePrivilegeAsync(int id)
         {
             var privilege = await _privilegeRepository.GetPrivilegeByIdAsync(id);
-            if (privilege == null) throw new Exception("Privilege not found");
+            if (privilege == null) throw new NotFoundException("Privilege not found");
 
             await _privilegeRepository.DeletePrivilegeAsync(privilege);
         }
