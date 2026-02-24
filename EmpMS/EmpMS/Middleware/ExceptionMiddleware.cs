@@ -1,24 +1,22 @@
-﻿using EmpMS.Exceptionss;
+﻿using EmpMS.Exceptions;
 using EmpMS.Helpers;
 using System.Net;
 using System.Text.Json;
 
 namespace EmpMS.Middleware
 {
-    public class ExceptionMiddleware : IMiddleware
+    public class ExceptionMiddleware
     {
-        private RequestDelegate _next;
-        ILogger<ExceptionMiddleware> _logger;
-        private APIResponse _apiResponse;
+        private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionMiddleware> _logger;
 
         public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
             _next = next;
             _logger = logger;
-            _apiResponse = new();
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        public async Task InvokeAsync(HttpContext context)
         {
             try
             {
@@ -52,11 +50,12 @@ namespace EmpMS.Middleware
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = Convert.ToInt32(statusCode);
 
-                _apiResponse.Status = false;
-                _apiResponse.StatusCode = statusCode;
-                _apiResponse.Errors.Add(ex.Message);
+                var apiResponse = new APIResponse();
+                apiResponse.Status = false;
+                apiResponse.StatusCode = statusCode;
+                apiResponse.Errors.Add(ex.Message);
 
-                var jsonResponse = JsonSerializer.Serialize(_apiResponse);
+                var jsonResponse = JsonSerializer.Serialize(apiResponse);
 
                 await context.Response.WriteAsync(jsonResponse);
             }
