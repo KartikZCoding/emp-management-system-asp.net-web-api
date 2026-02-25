@@ -45,7 +45,14 @@ namespace EmpMS.Middleware
                         break;
                 }
 
-                _logger.LogError(ex, ex.Message);
+                if (statusCode == HttpStatusCode.InternalServerError)
+                {
+                    _logger.LogError(ex, ex.Message);
+                }
+                else
+                {
+                    _logger.LogWarning(ex.Message);
+                }
 
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = Convert.ToInt32(statusCode);
