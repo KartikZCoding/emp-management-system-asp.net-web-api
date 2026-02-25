@@ -31,22 +31,14 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> GetAllRoles()
         {
-            try
-            {
-                var response = await _roleService.GetAllRolesAsync();
 
-                _apiResponse.Data = response;
-                _apiResponse.Status = true;
-                _apiResponse.StatusCode = HttpStatusCode.OK;
-                return Ok(_apiResponse);
-            }
-            catch (Exception ex)
-            {
-                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
-                _apiResponse.Status = false;
-                _apiResponse.Errors.Add(ex.Message);
-                return _apiResponse;
-            }
+            var response = await _roleService.GetAllRolesAsync();
+
+            _apiResponse.Data = response;
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+            return Ok(_apiResponse);
+
         }
 
         [HttpPost("create")]
@@ -57,22 +49,14 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> CreateRole(RoleDto roleDto)
         {
-            try
-            {
-                await _roleService.CreateRoleAsync(roleDto);
 
-                _apiResponse.Data = "Successfull";
-                _apiResponse.Status = true;
-                _apiResponse.StatusCode = HttpStatusCode.OK;
-                return Ok(_apiResponse);
-            }
-            catch (Exception ex)
-            {
-                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
-                _apiResponse.Status = false;
-                _apiResponse.Errors.Add(ex.Message);
-                return _apiResponse;
-            }
+            await _roleService.CreateRoleAsync(roleDto);
+
+            _apiResponse.Data = "Successfull";
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+            return Ok(_apiResponse);
+
         }
 
         [HttpPut("update/{id}")]
@@ -83,22 +67,14 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> UpdateRole(int id, RoleDto roleDto)
         {
-            try
-            {
-                await _roleService.UpdateRoleAsync(id, roleDto);
 
-                _apiResponse.Data = "Successfull";
-                _apiResponse.Status = true;
-                _apiResponse.StatusCode = HttpStatusCode.OK;
-                return Ok(_apiResponse);
-            }
-            catch (Exception ex)
-            {
-                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
-                _apiResponse.Status = false;
-                _apiResponse.Errors.Add(ex.Message);
-                return _apiResponse;
-            }
+            await _roleService.UpdateRoleAsync(id, roleDto);
+
+            _apiResponse.Data = "Successfull";
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+            return Ok(_apiResponse);
+
         }
 
         [HttpDelete("delete/{id}")]
@@ -109,22 +85,14 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> DeleteRole(int id)
         {
-            try
-            {
-                await _roleService.DeleteRoleAsync(id);
 
-                _apiResponse.Data = "Successfull";
-                _apiResponse.Status = true;
-                _apiResponse.StatusCode = HttpStatusCode.OK;
-                return Ok(_apiResponse);
-            }
-            catch (Exception ex)
-            {
-                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
-                _apiResponse.Status = false;
-                _apiResponse.Errors.Add(ex.Message);
-                return _apiResponse;
-            }
+            await _roleService.DeleteRoleAsync(id);
+
+            _apiResponse.Data = "Successfull";
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+            return Ok(_apiResponse);
+
         }
     }
 }

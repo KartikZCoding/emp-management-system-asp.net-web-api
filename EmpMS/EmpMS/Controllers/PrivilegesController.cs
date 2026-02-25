@@ -30,22 +30,14 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> GetAllPrivileges()
         {
-            try
-            {
-                var response = await _privilegeService.GetAllPrivilegesAsync();
 
-                _apiResponse.Data = response;
-                _apiResponse.Status = true;
-                _apiResponse.StatusCode = HttpStatusCode.OK;
-                return Ok(_apiResponse);
-            }
-            catch (Exception ex)
-            {
-                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
-                _apiResponse.Status = false;
-                _apiResponse.Errors.Add(ex.Message);
-                return _apiResponse;
-            }
+            var response = await _privilegeService.GetAllPrivilegesAsync();
+
+            _apiResponse.Data = response;
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+            return Ok(_apiResponse);
+
         }
 
         [HttpGet("id/{id}")]
@@ -56,22 +48,14 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> GetPrivilegeById(int id)
         {
-            try
-            {
-                var response = await _privilegeService.GetPrivilegeByIdAsync(id);
 
-                _apiResponse.Data = response;
-                _apiResponse.Status = true;
-                _apiResponse.StatusCode = HttpStatusCode.OK;
-                return Ok(_apiResponse);
-            }
-            catch (Exception ex)
-            {
-                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
-                _apiResponse.Status = false;
-                _apiResponse.Errors.Add(ex.Message);
-                return _apiResponse;
-            }
+            var response = await _privilegeService.GetPrivilegeByIdAsync(id);
+
+            _apiResponse.Data = response;
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+            return Ok(_apiResponse);
+
         }
 
         [HttpPost("create")]
@@ -82,22 +66,14 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> CreatePrivilege(PrivilegeDto privilegeDto)
         {
-            try
-            {
-                await _privilegeService.CreatePrivilegeAsync(privilegeDto);
 
-                _apiResponse.Data = "Successfull";
-                _apiResponse.Status = true;
-                _apiResponse.StatusCode = HttpStatusCode.OK;
-                return Ok(_apiResponse);
-            }
-            catch (Exception ex)
-            {
-                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
-                _apiResponse.Status = false;
-                _apiResponse.Errors.Add(ex.Message);
-                return _apiResponse;
-            }
+            await _privilegeService.CreatePrivilegeAsync(privilegeDto);
+
+            _apiResponse.Data = "Successfull";
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+            return Ok(_apiResponse);
+
         }
 
         [HttpPut("update/{id}")]
@@ -108,22 +84,14 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> UpdatePrivilege(int id, PrivilegeDto privilegeDto)
         {
-            try
-            {
-                await _privilegeService.UpdatePrivilegeAsync(id, privilegeDto);
 
-                _apiResponse.Data = "Successfull";
-                _apiResponse.Status = true;
-                _apiResponse.StatusCode = HttpStatusCode.OK;
-                return Ok(_apiResponse);
-            }
-            catch (Exception ex)
-            {
-                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
-                _apiResponse.Status = false;
-                _apiResponse.Errors.Add(ex.Message);
-                return _apiResponse;
-            }
+            await _privilegeService.UpdatePrivilegeAsync(id, privilegeDto);
+
+            _apiResponse.Data = "Successfull";
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+            return Ok(_apiResponse);
+
         }
 
         [HttpDelete("delete/{id}")]
@@ -134,22 +102,14 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> DeletePrivilege(int id)
         {
-            try
-            {
-                await _privilegeService.DeletePrivilegeAsync(id);
 
-                _apiResponse.Data = "Successfull";
-                _apiResponse.Status = true;
-                _apiResponse.StatusCode = HttpStatusCode.OK;
-                return Ok(_apiResponse);
-            }
-            catch (Exception ex)
-            {
-                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
-                _apiResponse.Status = false;
-                _apiResponse.Errors.Add(ex.Message);
-                return _apiResponse;
-            }
+            await _privilegeService.DeletePrivilegeAsync(id);
+
+            _apiResponse.Data = "Successfull";
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+            return Ok(_apiResponse);
+
         }
     }
 }
