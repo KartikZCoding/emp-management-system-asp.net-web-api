@@ -2,15 +2,18 @@
 using EmpMS.DTOs.Auth;
 using EmpMS.Models;
 using EmpMS.Repositories;
+using AutoMapper;
 
 namespace EmpMS.Services
 {
     public class RoleService : IRoleService
     {
         private readonly IRoleRepository _roleRepository;
-        public RoleService(IRoleRepository roleRepository)
+        private readonly IMapper _mapper;
+        public RoleService(IRoleRepository roleRepository, IMapper mapper)
         {
             _roleRepository = roleRepository;
+            _mapper = mapper;
         }
 
         public async Task CreateRoleAsync(RoleDto roleDto)
@@ -21,11 +24,12 @@ namespace EmpMS.Services
             if (await _roleRepository.RoleExistsAsync(roleDto.RoleName))
                 throw new BadRequestException("Role name is already exists");
 
-            var role = new Role
-            {
-                RoleName = roleDto.RoleName,
-                Description = roleDto.Description,
-            };
+            var role = _mapper.Map<Role>(roleDto);
+            //var role = new Role
+            //{
+            //    RoleName = roleDto.RoleName,
+            //    Description = roleDto.Description,
+            //};
 
             await _roleRepository.CreateRoleAsync(role);
         }
@@ -52,11 +56,12 @@ namespace EmpMS.Services
             if (role == null)
                 throw new NotFoundException("Role not found!");
 
-            var roleDto = new RoleDto
-            {
-                RoleName = role.RoleName,
-                Description = role.Description,
-            };
+            var roleDto = _mapper.Map<RoleDto>(role);
+            //var roleDto = new RoleDto
+            //{
+            //    RoleName = role.RoleName,
+            //    Description = role.Description,
+            //};
 
             return roleDto;
         }
@@ -73,8 +78,10 @@ namespace EmpMS.Services
             if (role == null)
                 throw new NotFoundException("Role not found!");
 
-            role.RoleName = roleDto.RoleName;
-            role.Description = roleDto.Description;
+            _mapper.Map(roleDto, role);
+
+            //role.RoleName = roleDto.RoleName;
+            //role.Description = roleDto.Description;
 
             await _roleRepository.UpdateRoleAsync(role);
             
