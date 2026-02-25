@@ -9,18 +9,30 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Serilog;
+using EmpMS.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var enableLogs = builder.Configuration.GetValue<bool>("Logging:EnableFileLogging");
+var logFolder = builder.Configuration.GetValue<string>("Logging:LogFolder");
+var logFile = builder.Configuration.GetValue<string>("Logging:LogFile");
+var logPath = Path.Combine(logFolder, logFile);
+
+
 /*serilog configuration*/
-Log.Logger = new LoggerConfiguration()
+var logConfig = new LoggerConfiguration()
     .MinimumLevel.Information()
     .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
     .MinimumLevel.Override("System", Serilog.Events.LogEventLevel.Warning)
-    .WriteTo.Console()
-    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
-    .CreateLogger();
+    .WriteTo.Console();
+
+if (Directory.Exists(logFolder) && File.Exists(logPath) && enableLogs)
+{
+    logConfig = logConfig.WriteTo.File(logPath, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}");
+}
+
+Log.Logger = logConfig.CreateLogger();
 
 builder.Host.UseSerilog();
 
@@ -124,6 +136,10 @@ builder.Services.AddAuthentication(options =>
             return new BadRequestObjectResult(response);
         };
     });*/
+
+/*automapper registered*/
+// AutoMapper 13+ syntax
+builder.Services.AddAutoMapper(cfg => { }, typeof(AutoMapperConfiguration));
 
 //**************************************************************************************************
 
