@@ -1,0 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace Application.DTOs.Auth
+{
+    public class LoginDto
+    {
+        [Required(ErrorMessage = "please enter a username!")]
+        public string Username { get; set; }
+        [Required(ErrorMessage = "please enter a password!")]
+        public string Password { get; set; }
+    }
+}

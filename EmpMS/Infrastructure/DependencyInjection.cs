@@ -1,0 +1,35 @@
+﻿using Application.Interfaces;
+using Domain.Interfaces;
+using Infrastructure.Data;
+using Infrastructure.Repositories;
+using Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace EmpMS.Infrastructure
+{
+    public static class DependencyInjection
+    {
+        public static IServiceCollection AddInfrastructure(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            // Database
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(
+                    configuration.GetConnectionString("EmpMSConString")));
+
+            // Repositories
+            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IPrivilegeRepository, PrivilegeRepository>();
+            services.AddScoped<IRolePrivilegeRepository, RolePrivilegeRepository>();
+
+            // Infrastructure Services
+            services.AddScoped<IJwtHelper, JwtHelper>();
+
+            return services;
+        }
+    }
+}

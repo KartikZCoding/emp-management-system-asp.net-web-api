@@ -1,8 +1,7 @@
-﻿using EmpMS.DTOs.Auth;
-using EmpMS.Helpers;
-using EmpMS.Services;
+using Application.Common;
+using Application.DTOs.Auth;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 

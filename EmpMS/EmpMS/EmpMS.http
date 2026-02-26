@@ -1,4 +1,4 @@
-@EmpMS_HostAddress = http://localhost:5198
+@EmpMS_HostAddress = http://localhost:5230
 
 GET {{EmpMS_HostAddress}}/weatherforecast/
 Accept: application/json
