@@ -1,29 +1,31 @@
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 
 namespace Application.DTOs.Employee
 {
-    public class CreateEmployeeDto
+    public class EmployeeResponseDto
     {
-        [Required]
+        public int Id { get; set; }
         public string FirstName { get; set; }
-        [Required]
         public string LastName { get; set; }
-        [Required]
-        [EmailAddress]
+        public string FullName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        [Required]
         public DateTime DOB { get; set; }
         public string Gender { get; set; }
         public string Address { get; set; }
-        [Required]
         public DateTime JoinDate { get; set; }
-        [Required]
         public int DepartmentId { get; set; }
-        [Required]
+        public string DepartmentName { get; set; }
         public int DesignationId { get; set; }
+        public string DesignationName { get; set; }
         public int? ManagerId { get; set; }
-        [Required]
+        public string? ManagerName { get; set; }
         public decimal Salary { get; set; }
+        public string? PhotoPath { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; } 
     }
 }
