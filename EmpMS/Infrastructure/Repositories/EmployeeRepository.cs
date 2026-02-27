@@ -31,7 +31,7 @@ namespace Infrastructure.Repositories
         {
             return await _appDbContext.Employees.Where(e => e.IsActive).CountAsync();
         }
-        public async Task<Employee> GetByIdAsync(int id)
+        public async Task<Employee?> GetByIdAsync(int id)
         {
             return await _appDbContext.Employees
                 .Include(e => e.Department)
@@ -82,8 +82,7 @@ namespace Infrastructure.Repositories
                 .Where(e => e.DepartmentId == departmentId && e.IsActive)
                 .ToListAsync();
         }
-        public async
-            Task<List<Employee>> GetByManagerAsync(int managerId)
+        public async Task<List<Employee>> GetByManagerAsync(int managerId)
         {
             return await _appDbContext.Employees
                 .Include(e => e.Department)
