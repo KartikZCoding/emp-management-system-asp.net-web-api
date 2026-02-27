@@ -25,6 +25,7 @@ namespace EmpMS.Infrastructure
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IPrivilegeRepository, PrivilegeRepository>();
             services.AddScoped<IRolePrivilegeRepository, RolePrivilegeRepository>();
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
             // Infrastructure Services
             services.AddScoped<IJwtHelper, JwtHelper>();
