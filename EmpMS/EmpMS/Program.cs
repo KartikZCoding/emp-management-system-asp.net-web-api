@@ -82,11 +82,8 @@ builder.Services.AddSwaggerGen(options =>
 /*register ALL infrastructure services*/
 builder.Services.AddInfrastructure(builder.Configuration);
 
-/*Register Services*/
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IPrivilegeService, PrivilegeService>();
-builder.Services.AddScoped<IRolePrivilegeService, RolePrivilegeService>();
+/*register ALL Application services*/
+builder.Services.AddApplication(builder.Configuration);
 
 
 /*Configure JWT Authentication*/
