@@ -17,7 +17,7 @@ namespace Infrastructure.Services
             _configuration = configuration;
         }
 
-        public string GenerateToken(int userId, string username, string rolename)
+        public string GenerateToken(int userId, string username, string email, string rolename)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
@@ -26,6 +26,7 @@ namespace Infrastructure.Services
             {
                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
                new Claim(ClaimTypes.Name, username),
+               new Claim(ClaimTypes.Email, email),
                new Claim(ClaimTypes.Role, rolename),
             };
 

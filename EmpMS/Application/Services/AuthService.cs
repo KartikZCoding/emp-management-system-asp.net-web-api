@@ -64,11 +64,12 @@ namespace Application.Services
                 throw new UnauthorizedException("User has no role assigned!");
             var role = userRole.Role;
 
-            string token = _jwtHelper.GenerateToken(user.Id, user.Username, role.RoleName);
+            string token = _jwtHelper.GenerateToken(user.Id, user.Username, user.Email, role.RoleName);
 
             var loginResponse = new LoginResponseDto
             {
                 Username = user.Username,
+                Email = user.Email,
                 Token = token,
                 Role = role.RoleName
             };
