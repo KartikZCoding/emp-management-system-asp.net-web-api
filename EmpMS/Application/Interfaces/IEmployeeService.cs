@@ -8,7 +8,7 @@ namespace Application.Interfaces
 {
     public interface IEmployeeService
     {
-        Task<PaginatedResult<EmployeeListDto>> GetAllEmployeesAsync(int page, int pageSize);
+        Task<PaginatedResult<EmployeeListDto>> GetAllEmployeesAsync(int page, int pageSize, string? sortBy, string? sortOrder);
         Task<EmployeeResponseDto> GetEmployeeByIdAsync(int id);
         Task CreateEmployeeAsync(CreateEmployeeDto dto);
         Task UpdateEmployeeAsync(int id, UpdateEmployeeDto dto);

@@ -16,13 +16,33 @@ namespace Infrastructure.Repositories
             _appDbContext = appDbContext;
         }
 
-        public async Task<List<Employee>> GetAllAsync(int page, int pageSize)
+        public async Task<List<Employee>> GetAllAsync(int page, int pageSize, string? sortBy, string? sortOrder)
         {
-            return await _appDbContext.Employees
+            var query = _appDbContext.Employees
                 .Where(e => e.IsActive)
                 .Include(e => e.Department)
                 .Include(e => e.Designation)
                 .Include(e => e.Manager)
+                .AsQueryable();
+
+            query = sortBy?.ToLower() switch
+            {
+                "name" => sortOrder == "desc"
+                            ? query.OrderByDescending(e => e.FirstName)
+                            : query.OrderBy(e => e.FirstName),
+                "salary" => sortOrder == "desc"
+                            ? query.OrderByDescending(e => e.Salary)
+                            : query.OrderBy(e => e.Salary),
+                "joindate" => sortOrder == "desc"
+                            ? query.OrderByDescending(e => e.JoinDate)
+                            : query.OrderBy(e => e.JoinDate),
+                "department" => sortOrder == "desc"
+                            ? query.OrderByDescending(e => e.Department.DepartmentName)
+                            : query.OrderBy(e => e.Department.DepartmentName),
+                _ => query.OrderBy(e => e.Id) // default sort by Id
+            };
+
+            return await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

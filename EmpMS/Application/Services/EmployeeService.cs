@@ -22,12 +22,15 @@ namespace Application.Services
             _mapper = mapper;
         }
 
-        public async Task<PaginatedResult<EmployeeListDto>> GetAllEmployeesAsync(int page, int pageSize)
+        public async Task<PaginatedResult<EmployeeListDto>> GetAllEmployeesAsync(int page, int pageSize, string? sortBy, string? sortOrder)
         {
             if (page <= 0) page = 1;
             if (pageSize <= 0) pageSize = 10;
 
-            var employees = await _employeeRepository.GetAllAsync(page, pageSize);
+            // normalize sortOrder to lowercase
+            sortOrder = sortOrder?.ToLower() == "desc" ? "desc" : "asc";
+
+            var employees = await _employeeRepository.GetAllAsync(page, pageSize, sortBy, sortOrder);
             if (employees == null) throw new BadRequestException("No record found");
 
             var totalCount = await _employeeRepository.GetTotalCountAsync();

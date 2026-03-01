@@ -7,7 +7,7 @@ namespace Domain.Interfaces
 {
     public interface IEmployeeRepository
     {   
-        Task<List<Employee>> GetAllAsync(int page, int pageSize);
+        Task<List<Employee>> GetAllAsync(int page, int pageSize, string? sortBy, string? sortOrder);
         Task<int> GetTotalCountAsync();
         Task<Employee?> GetByIdAsync(int id);
         Task CreateAsync(Employee employee);
