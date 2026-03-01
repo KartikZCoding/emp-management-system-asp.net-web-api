@@ -15,26 +15,29 @@ namespace EmpMS.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
+            var method = context.Request.Method;
+            var path = context.Request.Path;
+            var statusCode = context.Response.StatusCode;
+
+            _logger.LogInformation("REQUEST  HTTP {method} {path} incoming", method, path);
+
             Stopwatch stopwatch = Stopwatch.StartNew();
             await _next(context);
             stopwatch.Stop();
 
             var elapsedTime = stopwatch.ElapsedMilliseconds;
-            var method = context.Request.Method;
-            var path = context.Request.Path;
-            var statusCode = context.Response.StatusCode;
 
             if (statusCode < 400)
             {
-                _logger.LogInformation("HTTP {method} {path} responded {statusCode} in {elapsedTime}ms", method, path, statusCode, elapsedTime);
+                _logger.LogInformation("RESPONSE HTTP {method} {path} responded {statusCode} in {elapsedTime}ms", method, path, statusCode, elapsedTime);
             }
             else if (statusCode >= 400 && statusCode < 500)
             {
-                _logger.LogWarning("HTTP {method} {path} responded {statusCode} in {elapsedTime}ms", method, path, statusCode, elapsedTime);
+                _logger.LogWarning("RESPONSE HTTP {method} {path} responded {statusCode} in {elapsedTime}ms", method, path, statusCode, elapsedTime);
             }
             else if (statusCode >= 500)
             {
-                _logger.LogError("HTTP {method} {path} responded {statusCode} in {elapsedTime}ms", method, path, statusCode, elapsedTime);
+                _logger.LogError("RESPONSE HTTP {method} {path} responded {statusCode} in {elapsedTime}ms", method, path, statusCode, elapsedTime);
             }
         }
     }
