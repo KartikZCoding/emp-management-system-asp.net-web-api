@@ -125,6 +125,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles(); // serve photos from wwwroot
+
 app.UseAuthentication();
 app.UseAuthorization();
 

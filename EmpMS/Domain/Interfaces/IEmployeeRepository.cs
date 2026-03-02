@@ -6,7 +6,7 @@ using System.Text;
 namespace Domain.Interfaces
 {
     public interface IEmployeeRepository
-    {   
+    {
         Task<List<Employee>> GetAllAsync(int page, int pageSize, string? sortBy, string? sortOrder);
         Task<int> GetTotalCountAsync();
         Task<Employee?> GetByIdAsync(int id);
@@ -18,5 +18,6 @@ namespace Domain.Interfaces
         Task<List<Employee>> GetByManagerAsync(int managerId);
         Task<bool> EmailExistAsync(string email);
         Task<Employee?> GetByEmailAsync(string email);
-    }   
+        Task UpdatePhotoPathAsync(int id, string photoPath);
+    }
 }

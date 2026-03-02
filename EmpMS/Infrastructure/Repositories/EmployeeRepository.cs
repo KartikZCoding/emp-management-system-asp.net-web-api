@@ -121,5 +121,15 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(e => e.Email == email);
         }
 
+        public async Task UpdatePhotoPathAsync(int id, string photoPath)
+        {
+            var employee = await _appDbContext.Employees.FindAsync(id);
+            if(employee != null)
+            {
+                employee.PhotoPath = photoPath;
+                employee.UpdatedAt = DateTime.Now;
+                await _appDbContext.SaveChangesAsync();
+            }
+        }
     }
 }
