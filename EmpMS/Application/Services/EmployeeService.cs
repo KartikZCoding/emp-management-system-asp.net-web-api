@@ -5,9 +5,12 @@ using AutoMapper;
 using Domain.Entities;
 using Domain.Exceptions;
 using Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services
 {
@@ -15,11 +18,15 @@ namespace Application.Services
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IMapper _mapper;
+        private readonly IWebHostEnvironment _env;
+        private readonly ILogger<EmployeeService> _logger;
 
-        public EmployeeService(IEmployeeRepository employeeRepository, IMapper mapper)
+        public EmployeeService(IEmployeeRepository employeeRepository, IMapper mapper, IWebHostEnvironment env, ILogger<EmployeeService> logger)
         {
             _employeeRepository = employeeRepository;
             _mapper = mapper;
+            _env = env;
+            _logger = logger;
         }
 
         public async Task<PaginatedResult<EmployeeListDto>> GetAllEmployeesAsync(int page, int pageSize, string? sortBy, string? sortOrder)
@@ -130,5 +137,78 @@ namespace Application.Services
             await _employeeRepository.UpdateAsync(employee);
         }
 
+        public async Task UploadPhotoAsync(int id, IFormFile file)
+        {
+            var employee = await _employeeRepository.GetByIdAsync(id);
+            if (employee == null)
+                throw new NotFoundException("Employee not found!");
+
+            if (file == null || file.Length == 0)
+                throw new BadHttpRequestException("No file uploaded!");
+
+            var allowedExtentions = new[] { ".jpg", ".jpeg", ".png" };
+            var extention = Path.GetExtension(file.FileName).ToLower();
+            //_logger.LogInformation($"Service : file extension is {extention}");
+
+            if (!allowedExtentions.Contains(extention))
+                throw new BadRequestException("Only .jpg, .jpeg, .png files are allowed!");
+
+            if (file.Length > 2 * 1024 * 1024)
+                throw new BadRequestException("File size must be less than 2MB!");
+
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "photos");
+            //_logger.LogInformation($"Service : upload folder is {uploadsFolder}");
+            Directory.CreateDirectory(uploadsFolder);
+
+            if(!string.IsNullOrEmpty(employee.PhotoPath))
+            {
+                var oldFilePath = Path.Combine(_env.WebRootPath, employee.PhotoPath.TrimStart('/'));
+                //_logger.LogInformation($"Service : old file path is {oldFilePath}");
+                if (File.Exists(oldFilePath))
+                    File.Delete(oldFilePath);
+            }
+
+            var fileName = $"employee_{id}{extention}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+            //_logger.LogInformation($"Service : file name is {fileName}, file path is {filePath}");
+
+            using (var strem = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(strem);
+            }
+
+            var relativePath = $"/uploads/photos/{fileName}";
+            await _employeeRepository.UpdatePhotoPathAsync(id, relativePath);
+        }
+
+        public async Task<(byte[] fileBytes, string contentType)> GetPhotoAsync(int id)
+        {
+            var employee = await _employeeRepository.GetByIdAsync(id);
+            if (employee == null)
+                throw new NotFoundException("Employee not found!");
+
+            if (string.IsNullOrEmpty(employee.PhotoPath))
+                throw new NotFoundException("No photo uploaded for this employee!");
+
+            //_logger.LogInformation($"Service : get photo path is {employee.PhotoPath} without TrimStart.");
+            var filePath = Path.Combine(_env.WebRootPath, employee.PhotoPath.TrimStart('/'));
+            //_logger.LogInformation($"Service : get photo file path is {filePath} with TrimStart.");
+
+
+            if (!File.Exists(filePath))
+                throw new NotFoundException("Photo file not found on server!");
+
+            var fileBytes = await File.ReadAllBytesAsync(filePath);
+
+            var extension = Path.GetExtension(filePath).ToLower();
+            var contentType = extension switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                _ => "application/octet-stream"
+            };
+
+            return (fileBytes, contentType);
+        }
     }
 }

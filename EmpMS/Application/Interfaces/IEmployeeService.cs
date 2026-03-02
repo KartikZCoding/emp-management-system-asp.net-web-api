@@ -1,5 +1,6 @@
 ﻿using Application.Common;
 using Application.DTOs.Employee;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,5 +19,7 @@ namespace Application.Interfaces
         Task<List<EmployeeListDto>> GetByManagerAsync(int managerId);
         Task<EmployeeResponseDto> GetOwnProfileAsync(string email);
         Task UpdateOwnProfileAsync(string email, UpdateOwnProfileDto dto);
+        Task UploadPhotoAsync(int id, IFormFile file);
+        Task<(byte[] fileBytes, string contentType)> GetPhotoAsync(int id);
     }
 }
