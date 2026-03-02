@@ -17,11 +17,12 @@ namespace EmpMS.Controllers
     {
         private readonly IEmployeeService _employeeService;
         private APIResponse _apiResponse;
-
-        public EmployeesController(IEmployeeService employeeService)
+        private readonly ILogger<EmployeesController> _logger;
+        public EmployeesController(IEmployeeService employeeService, ILogger<EmployeesController> logger)
         {
             _employeeService = employeeService;
             _apiResponse = new();
+            _logger = logger;
         }
 
         [HttpGet]
@@ -173,6 +174,30 @@ namespace EmpMS.Controllers
             _apiResponse.Status = true;
             _apiResponse.StatusCode = HttpStatusCode.OK;
             return Ok(_apiResponse);
+        }
+
+        [HttpPost("{id}/photo")]
+        [Authorize(Roles = "HR,Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> UploadPhoto(int id, IFormFile file)
+        {
+            //_logger.LogInformation("Controller : called service");
+            await _employeeService.UploadPhotoAsync(id, file);
+
+            _apiResponse.Data = "Photo uploaded successfully!";
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+
+            return Ok(_apiResponse);
+        }
+
+        [HttpGet("{id}/photo")]
+        [AllowAnonymous]  // photos can be viewed without login
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPhoto(int id)
+        {
+            var (fileBytes, contentType) = await _employeeService.GetPhotoAsync(id);
+            return File(fileBytes, contentType);
         }
     }
 }
