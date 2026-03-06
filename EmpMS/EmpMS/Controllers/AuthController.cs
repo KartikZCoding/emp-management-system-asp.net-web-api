@@ -118,10 +118,11 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> RefreshToken()
+        public async Task<ActionResult<APIResponse>> RefreshToken(RefreshTokenDto refreshTokenDto)
         {
+            var reponse = await _authService.RefreshTokenAsync(refreshTokenDto);
 
-            _apiResponse.Data = "Comming soon!";
+            _apiResponse.Data = reponse;
             _apiResponse.Status = true;
             _apiResponse.StatusCode = HttpStatusCode.OK;
             return Ok(_apiResponse);
