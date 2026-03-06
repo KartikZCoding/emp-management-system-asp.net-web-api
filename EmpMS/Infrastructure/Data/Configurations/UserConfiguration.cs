@@ -22,6 +22,7 @@ namespace Infrastructure.Data.Configurations
             builder.Property(u => u.PasswordHash).IsRequired();
             builder.Property(u => u.IsActive).HasDefaultValue(true);
             builder.Property(u => u.CreatedAt).HasDefaultValueSql("GETDATE()");
+            builder.Property(u => u.RefreshToken).HasMaxLength(256);
 
             builder.HasData(new User
             {
