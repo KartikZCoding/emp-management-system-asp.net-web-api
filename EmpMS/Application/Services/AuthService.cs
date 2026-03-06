@@ -1,8 +1,9 @@
-using Application.Interfaces;
 using Application.DTOs.Auth;
-using Domain.Interfaces;
-using Domain.Exceptions;
+using Application.Interfaces;
 using Domain.Entities;
+using Domain.Exceptions;
+using Domain.Interfaces;
+using System.Security.Claims;
 
 namespace Application.Services
 {
@@ -64,13 +65,21 @@ namespace Application.Services
                 throw new UnauthorizedException("User has no role assigned!");
             var role = userRole.Role;
 
+            //generate both tokens
             string token = _jwtHelper.GenerateToken(user.Id, user.Username, user.Email, role.RoleName);
+            string refreshToken = _jwtHelper.GenerateRefreshToken();
+
+            //save refresh token to DB
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            await _authRepository.UpdateUserAsync(user);
 
             var loginResponse = new LoginResponseDto
             {
                 Username = user.Username,
                 Email = user.Email,
                 Token = token,
+                RefreshToken = refreshToken,
                 Role = role.RoleName
             };
 
@@ -119,5 +128,47 @@ namespace Application.Services
 
         }
 
+        public async Task<LoginResponseDto> RefreshTokenAsync(RefreshTokenDto dto)
+        {
+            // 1. Extract claims from the expired access token
+            var principal = _jwtHelper.GetPrincipalFromExpiredToken(dto.AccessToken);
+            if(principal == null)
+                throw new UnauthorizedException("Invalid access token!");
+
+            var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null)
+                throw new UnauthorizedException("Invalid token claims");
+
+            int userId = int.Parse(userIdClaim);
+
+            // 2. Get user and validate refresh token
+            var user = await _authRepository.GetUserByIdAsync(userId);
+            if (user == null || user.RefreshToken != dto.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+                throw new UnauthorizedException("Invalid or expired refresh token");
+
+            // 3. Get user role
+            var fullUser = await _authRepository.GetUserByUsernameAsync(user.Username);
+            var role = fullUser.UserRoles.FirstOrDefault()?.Role;
+            if (role == null)
+                throw new UnauthorizedException("User has no role assigned");
+
+            // 4. Generate new tokens (token rotation)
+            string newAccessToken = _jwtHelper.GenerateToken(user.Id, user.Username, user.Email, role.RoleName);
+            string newRefreshToken = _jwtHelper.GenerateRefreshToken();
+
+            // 5. Save new refresh token (invalidates old one)
+            user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            await _authRepository.UpdateUserAsync(user);
+
+            return new LoginResponseDto
+            {
+                Token = newAccessToken,
+                RefreshToken = newRefreshToken,
+                Username = user.Username,
+                Email = user.Email,
+                Role = role.RoleName
+            };
+        }
     }
 }

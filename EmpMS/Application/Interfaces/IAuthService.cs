@@ -9,5 +9,6 @@ namespace Application.Interfaces
         Task UserResetPasswordAsync(int userId, ResetPassUserDto dto);
         Task AdminResetPasswordAsync(ResetPassAdminDto dto);
         Task ChangePasswordAsync(int userId, ChangePasswordDto dto);
+        Task<LoginResponseDto> RefreshTokenAsync(RefreshTokenDto dto);
     }
 }
