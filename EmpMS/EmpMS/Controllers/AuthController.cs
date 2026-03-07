@@ -46,7 +46,23 @@ namespace EmpMS.Controllers
         {
             var response = await _authService.LoginAsync(loginDto);
 
-            _apiResponse.Data = response;
+            Response.Cookies.Append("accessToken", response.Token, new CookieOptions
+            {
+                HttpOnly = true,  // JavaScript CANNOT read this cookie (prevents XSS)
+                Secure = true,        // Cookie only sent over HTTPS
+                SameSite = SameSiteMode.Strict, // Cookie not sent on cross-site requests (prevents CSRF)
+                Expires = DateTime.UtcNow.AddMinutes(15)  // Match token expiry
+            });
+
+            Response.Cookies.Append("refreshToken", response.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(7)
+            });
+
+            _apiResponse.Data = new { response.Username, response.Email, response.Role };
             _apiResponse.Status = true;
             _apiResponse.StatusCode = HttpStatusCode.OK;
             return Ok(_apiResponse);
