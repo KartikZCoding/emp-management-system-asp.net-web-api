@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Security.Cryptography;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -88,6 +89,10 @@ builder.Services.AddApplication(builder.Configuration);
 
 /*Configure JWT Authentication*/
 /*-------------------------------------------------------------------------------------------------------------------*/
+var publicKeyText = File.ReadAllText(builder.Configuration["Jwt:PublicKeyPath"]);
+var rsa = RSA.Create();
+rsa.ImportFromPem(publicKeyText);
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -103,7 +108,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        IssuerSigningKey = new RsaSecurityKey(rsa)
     };
 });
 /*-------------------------------------------------------------------------------------------------------------------*/

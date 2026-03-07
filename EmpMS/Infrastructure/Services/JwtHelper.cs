@@ -20,8 +20,13 @@ namespace Infrastructure.Services
 
         public string GenerateToken(int userId, string username, string email, string rolename)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+            var privateKey = File.ReadAllText(_configuration["Jwt:PrivateKeyPath"]);
+
+            var rsa = RSA.Create();
+            rsa.ImportFromPem(privateKey);
+            var key = new RsaSecurityKey(rsa);
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
 
             var claims = new List<Claim>
             {
@@ -53,6 +58,10 @@ namespace Infrastructure.Services
 
         public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
         {
+            var publicKeyText = File.ReadAllText(_configuration["Jwt:PublicKeyPath"]);
+            var rsa = RSA.Create();
+            rsa.ImportFromPem(publicKeyText);
+
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
@@ -61,15 +70,14 @@ namespace Infrastructure.Services
                 ValidateLifetime = false,   // KEY: we allow expired tokens here
                 ValidIssuer = _configuration["Jwt:Issuer"],
                 ValidAudience = _configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]))
+                IssuerSigningKey = new RsaSecurityKey(rsa)
             };
 
             var principal = new JwtSecurityTokenHandler()
                 .ValidateToken(token, tokenValidationParameters, out var securityToken);
 
             if (securityToken is not JwtSecurityToken jwtToken ||
-                !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512, StringComparison.InvariantCultureIgnoreCase))
+                !jwtToken.Header.Alg.Equals(SecurityAlgorithms.RsaSha256, StringComparison.InvariantCultureIgnoreCase))
                 throw new SecurityTokenException("Invalid token");
 
             return principal;

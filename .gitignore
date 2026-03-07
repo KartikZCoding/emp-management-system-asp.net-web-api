@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Ignore private key
+[Kk]eys/
+[Kk]eys/private.key
+
 # User-specific files
 *.rsuser
 *.suo
