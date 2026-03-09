@@ -68,7 +68,58 @@ namespace EmpMS.Controllers
             return Ok(_apiResponse);
         }
 
+
+        [AllowAnonymous]
+        [HttpPost("forgot-password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<APIResponse>> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            await _authService.SendOtpAsync(forgotPasswordDto);
+
+            _apiResponse.Data = "Otp sent successfully!";
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+
+            return Ok(_apiResponse);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("reset-password-otp")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<APIResponse>> ResetPassword(ResetPasswordDto resetPasswordDto)
+        {
+            await _authService.ResetPasswordAsync(resetPasswordDto);
+
+            _apiResponse.Data = "Password changed successfully!";
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+
+            return Ok(_apiResponse);
+        }
+
         [Authorize]
+        [HttpPost("refresh-token")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<APIResponse>> RefreshToken(RefreshTokenDto refreshTokenDto)
+        {
+            var reponse = await _authService.RefreshTokenAsync(refreshTokenDto);
+
+            _apiResponse.Data = reponse;
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+            return Ok(_apiResponse);
+
+        }
+
+        /*[Authorize]
         [HttpPost("user-reset-password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -125,25 +176,7 @@ namespace EmpMS.Controllers
             _apiResponse.Data = "Successfull";
             return Ok(_apiResponse);
 
-        }
-
-        [Authorize]
-        [HttpPost("refresh-token")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> RefreshToken(RefreshTokenDto refreshTokenDto)
-        {
-            var reponse = await _authService.RefreshTokenAsync(refreshTokenDto);
-
-            _apiResponse.Data = reponse;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
-
-        }
+        }*/
 
     }
 }
