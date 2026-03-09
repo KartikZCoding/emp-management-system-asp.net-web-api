@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Services;
 using Domain.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
@@ -26,6 +27,8 @@ namespace EmpMS.Infrastructure
             services.AddScoped<IPrivilegeRepository, PrivilegeRepository>();
             services.AddScoped<IRolePrivilegeRepository, RolePrivilegeRepository>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
+            services.AddScoped<IEmailService, EmailService>();
 
             // Infrastructure Services
             services.AddScoped<IJwtHelper, JwtHelper>();

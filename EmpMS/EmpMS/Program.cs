@@ -17,6 +17,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+/*cache memory for otp*/
+builder.Services.AddMemoryCache();
+
 /*serilog configuration*/
 /*-------------------------------------------------------------------------------------------------------------------*/
 var enableLogs = builder.Configuration.GetValue<bool>("Logging:EnableFileLogging");
@@ -125,6 +128,7 @@ builder.Services.AddAuthentication(options =>
 
 /*automapper registered AutoMapper 13+ syntax*/
 builder.Services.AddAutoMapper(cfg => { }, typeof(AutoMapperProfile));
+
 
 var app = builder.Build();
 
