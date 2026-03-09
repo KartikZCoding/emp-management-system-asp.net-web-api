@@ -70,7 +70,8 @@ namespace Infrastructure.Services
                 ValidateLifetime = false,   // KEY: we allow expired tokens here
                 ValidIssuer = _configuration["Jwt:Issuer"],
                 ValidAudience = _configuration["Jwt:Audience"],
-                IssuerSigningKey = new RsaSecurityKey(rsa)
+                IssuerSigningKey = new RsaSecurityKey(rsa),
+                ClockSkew = TimeSpan.Zero
             };
 
             var principal = new JwtSecurityTokenHandler()

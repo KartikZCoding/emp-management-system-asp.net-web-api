@@ -121,7 +121,8 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new RsaSecurityKey(rsa)
+        IssuerSigningKey = new RsaSecurityKey(rsa),
+        ClockSkew = TimeSpan.Zero
     };
 });
 /*-------------------------------------------------------------------------------------------------------------------*/

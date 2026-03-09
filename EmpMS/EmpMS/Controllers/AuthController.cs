@@ -1,6 +1,7 @@
 using Application.Common;
 using Application.DTOs.Auth;
 using Application.Interfaces;
+using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -62,7 +63,7 @@ namespace EmpMS.Controllers
                 Expires = DateTime.UtcNow.AddDays(7)
             });
 
-            _apiResponse.Data = new { response.Username, response.Email, response.Role };
+            _apiResponse.Data = new { response.Username, response.Email, response.Role, response.RefreshToken };
             _apiResponse.Status = true;
             _apiResponse.StatusCode = HttpStatusCode.OK;
             return Ok(_apiResponse);
@@ -101,7 +102,7 @@ namespace EmpMS.Controllers
             return Ok(_apiResponse);
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpPost("refresh-token")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -110,9 +111,25 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> RefreshToken(RefreshTokenDto refreshTokenDto)
         {
-            var reponse = await _authService.RefreshTokenAsync(refreshTokenDto);
+            var response = await _authService.RefreshTokenAsync(refreshTokenDto);
 
-            _apiResponse.Data = reponse;
+            Response.Cookies.Append("accessToken", response.Token, new CookieOptions
+            {
+                HttpOnly = true,  // JavaScript CANNOT read this cookie (prevents XSS)
+                Secure = true,        // Cookie only sent over HTTPS
+                SameSite = SameSiteMode.Strict, // Cookie not sent on cross-site requests (prevents CSRF)
+                Expires = DateTime.UtcNow.AddMinutes(15)  // Match token expiry
+            });
+
+            Response.Cookies.Append("refreshToken", response.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(7)
+            });
+
+            _apiResponse.Data = new { response.Username, response.Email, response.Role, response.RefreshToken };
             _apiResponse.Status = true;
             _apiResponse.StatusCode = HttpStatusCode.OK;
             return Ok(_apiResponse);

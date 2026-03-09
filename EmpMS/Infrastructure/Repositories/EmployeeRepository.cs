@@ -57,7 +57,7 @@ namespace Infrastructure.Repositories
                 .Include(e => e.Department)
                 .Include(e => e.Designation)
                 .Include(e => e.Manager)
-                .Where(e => e.Id == id)
+                .Where(e => e.Id == id && e.IsActive)
                 .FirstOrDefaultAsync();
         }
         public async Task CreateAsync(Employee employee)
@@ -112,19 +112,19 @@ namespace Infrastructure.Repositories
         }
         public async Task<bool> EmailExistAsync(string email)
         {
-            return await _appDbContext.Employees.AnyAsync(e => e.Email == email);
+            return await _appDbContext.Employees.AnyAsync(e => e.Email == email && e.IsActive);
         }
         public async Task<Employee?> GetByEmailAsync(string email)
         {
             return await _appDbContext.Employees
                 .Include(e => e.Department).Include(e => e.Designation).Include(e => e.Manager)
-                .FirstOrDefaultAsync(e => e.Email == email);
+                .FirstOrDefaultAsync(e => e.Email == email && e.IsActive);
         }
 
         public async Task UpdatePhotoPathAsync(int id, string photoPath)
         {
             var employee = await _appDbContext.Employees.FindAsync(id);
-            if(employee != null)
+            if (employee != null)
             {
                 employee.PhotoPath = photoPath;
                 employee.UpdatedAt = DateTime.Now;
