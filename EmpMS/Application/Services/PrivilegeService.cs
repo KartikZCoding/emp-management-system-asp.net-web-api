@@ -16,23 +16,25 @@ namespace Application.Services
             _privilegeRepository = privilegeRepository;
         }
 
-        public async Task<List<PrivilegeDto>> GetAllPrivilegesAsync()
+        public async Task<List<PrivilegeResponseDto>> GetAllPrivilegesAsync()
         {
             var privileges = await _privilegeRepository.GetAllPrivilegesAsync();
-            return privileges.Select(p => new PrivilegeDto
+            return privileges.Select(p => new PrivilegeResponseDto
             {
+                Id = p.Id,
                 PrivilegeName = p.PrivilegeName,
                 Description = p.Description
             }).ToList();
         }
 
-        public async Task<PrivilegeDto> GetPrivilegeByIdAsync(int id)
+        public async Task<PrivilegeResponseDto> GetPrivilegeByIdAsync(int id)
         {
             var privilege = await _privilegeRepository.GetPrivilegeByIdAsync(id);
             if (privilege == null) throw new NotFoundException("Privilege not found");
 
-            return new PrivilegeDto
+            return new PrivilegeResponseDto
             {
+                Id = privilege.Id,
                 PrivilegeName = privilege.PrivilegeName,
                 Description = privilege.Description
             };

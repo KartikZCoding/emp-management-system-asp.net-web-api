@@ -36,12 +36,13 @@ namespace Application.Services
             await _roleRepository.CreateRoleAsync(role);
         }
 
-        public async Task<List<RoleDto>> GetAllRolesAsync()
+        public async Task<List<RoleResponseDto>> GetAllRolesAsync()
         {
-            var roles =  await _roleRepository.GetAllRolesAsync();
+            var roles = await _roleRepository.GetAllRolesAsync();
 
-            var roleDtos = roles.Select(r => new RoleDto
+            var roleDtos = roles.Select(r => new RoleResponseDto
             {
+                Id = r.Id,
                 RoleName = r.RoleName,
                 Description = r.Description,
             }).ToList();
@@ -49,7 +50,7 @@ namespace Application.Services
             return roleDtos;
         }
 
-        public async Task<RoleDto> GetRoleByIdAsync(int id)
+        public async Task<RoleResponseDto> GetRoleByIdAsync(int id)
         {
             if (id <= 0)
                 throw new BadRequestException("Enter a valid id number!");
@@ -58,12 +59,12 @@ namespace Application.Services
             if (role == null)
                 throw new NotFoundException("Role not found!");
 
-            var roleDto = _mapper.Map<RoleDto>(role);
-            //var roleDto = new RoleDto
-            //{
-            //    RoleName = role.RoleName,
-            //    Description = role.Description,
-            //};
+            var roleDto = new RoleResponseDto
+            {
+                Id = role.Id,
+                RoleName = role.RoleName,
+                Description = role.Description,
+            };
 
             return roleDto;
         }
@@ -86,7 +87,7 @@ namespace Application.Services
             //role.Description = roleDto.Description;
 
             await _roleRepository.UpdateRoleAsync(role);
-            
+
         }
 
         public async Task DeleteRoleAsync(int id)

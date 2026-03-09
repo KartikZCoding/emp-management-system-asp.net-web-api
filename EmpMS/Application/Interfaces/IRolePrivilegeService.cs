@@ -6,6 +6,6 @@ namespace Application.Interfaces
     {
         Task AssignPrivilegeToRoleAsync(RolePrivilegeDto dto);
         Task RemovePrivilegeFromRoleAsync(int roleId, int privilegeId);
-        Task<List<PrivilegeDto>> GetPrivilegesByRoleIdAsync(int roleId);
+        Task<List<PrivilegeResponseDto>> GetPrivilegesByRoleIdAsync(int roleId);
     }
 }

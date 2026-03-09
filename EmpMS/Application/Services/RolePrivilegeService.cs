@@ -46,15 +46,16 @@ namespace Application.Services
             await _repository.AddRolePrivilegeAsync(rolePrivilege);
         }
 
-        public async Task<List<PrivilegeDto>> GetPrivilegesByRoleIdAsync(int roleId)
+        public async Task<List<PrivilegeResponseDto>> GetPrivilegesByRoleIdAsync(int roleId)
         {
             if (roleId <= 0) throw new BadRequestException("Please enter a valid role id!");
 
             var privileges = await _repository.GetPrivilegesByRoleIdAsync(roleId);
             if (privileges.Count == 0) throw new NotFoundException("Privileges not found!");
 
-            return privileges.Select(p => new PrivilegeDto
+            return privileges.Select(p => new PrivilegeResponseDto
             {
+                Id = p.Id,
                 PrivilegeName = p.PrivilegeName,
                 Description = p.Description
             }).ToList();
