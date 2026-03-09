@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Domain.Entities;
 using Domain.Exceptions;
 using Domain.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 using System.Security.Claims;
 
 namespace Application.Services
@@ -12,12 +13,16 @@ namespace Application.Services
         private readonly IAuthRepository _authRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly IJwtHelper _jwtHelper;
+        private readonly IMemoryCache _cache;
+        private readonly IEmailService _emailService;
 
-        public AuthService(IAuthRepository authRepository, IRoleRepository roleRepository, IJwtHelper jwtHelper)
+        public AuthService(IAuthRepository authRepository, IRoleRepository roleRepository, IJwtHelper jwtHelper, IMemoryCache cache, IEmailService emailService)
         {
             _authRepository = authRepository;
             _roleRepository = roleRepository;
             _jwtHelper = jwtHelper;
+            _cache = cache;
+            _emailService = emailService;
         }
 
         public async Task RegisterAsync(RegisterDto dto)
@@ -86,48 +91,6 @@ namespace Application.Services
             return loginResponse;
         }
 
-        public async Task UserResetPasswordAsync(int userId, ResetPassUserDto dto)
-        {
-            if (string.IsNullOrEmpty(dto.NewPassword)) throw new BadRequestException("please enter a new password!");
-
-            var user = await _authRepository.GetUserByIdAsync(userId);
-            if (user == null)
-                throw new NotFoundException("User not found!");
-
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-
-            await _authRepository.UpdateUserAsync(user);
-        }
-
-        public async Task AdminResetPasswordAsync(ResetPassAdminDto dto)
-        {
-            if (string.IsNullOrEmpty(dto.NewPassword)) throw new BadRequestException("please enter a new password!");
-
-            var user = await _authRepository.GetUserByIdAsync(dto.UserId);
-            if (user == null)
-                throw new NotFoundException("User not found!");
-
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-
-            await _authRepository.UpdateUserAsync(user);
-        }
-
-        public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
-        {
-            var user = await _authRepository.GetUserByIdAsync(userId);
-            if (user == null)
-                throw new NotFoundException("User not found!");
-
-            bool isOldPasswordValid = BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash);
-            if (!isOldPasswordValid)
-                throw new BadRequestException("Old password is incorrect");
-
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-
-            await _authRepository.UpdateUserAsync(user);
-
-        }
-
         public async Task<LoginResponseDto> RefreshTokenAsync(RefreshTokenDto dto)
         {
             // 1. Extract claims from the expired access token
@@ -170,5 +133,98 @@ namespace Application.Services
                 Role = role.RoleName
             };
         }
+
+        public async Task SendOtpAsync(ForgotPasswordDto forgotPasswordDto)
+        {
+            if (string.IsNullOrEmpty(forgotPasswordDto.Email))
+                throw new BadRequestException("Enter a valid email!");
+
+            var user = await _authRepository.GetUserByEmailAsync(forgotPasswordDto.Email);
+            if (user == null)
+                throw new NotFoundException("User not found!");
+
+            var otp = new Random().Next(100000, 999999).ToString();
+
+            var options = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            };
+
+            _cache.Set(forgotPasswordDto.Email, otp, options);
+
+            string sub = "Reset Password OTP";
+            string body = $"Your OTP is: {otp}. Valid upto 5 min!";
+
+            await _emailService.SendEmailAsync(forgotPasswordDto.Email, sub, body);
+        }
+
+        public async Task ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+        {
+            if (string.IsNullOrEmpty(resetPasswordDto.Otp)) throw new BadRequestException("Enter a OTP!");
+            if (string.IsNullOrEmpty(resetPasswordDto.NewPassword)) throw new BadRequestException("Enter a new password!");
+
+            if (!_cache.TryGetValue(resetPasswordDto.Email, out var cachedOtp))
+                throw new BadRequestException("OTP expired or invalid email!");
+
+            if (cachedOtp?.ToString() != resetPasswordDto.Otp)
+                throw new BadRequestException("Invalid OTP");
+
+            var user = await _authRepository.GetUserByEmailAsync(resetPasswordDto.Email);
+
+            if (user == null)
+                throw new NotFoundException("User not found");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(resetPasswordDto.NewPassword);
+
+            await _authRepository.UpdateUserAsync(user);
+            _cache.Remove(resetPasswordDto.Email);
+        }
+
+/* Don't used */
+/*------------------------------------------------------------------------------------------------------*/
+/*
+        public async Task UserResetPasswordAsync(int userId, ResetPassUserDto dto)
+        {
+            if (string.IsNullOrEmpty(dto.NewPassword)) throw new BadRequestException("please enter a new password!");
+
+            var user = await _authRepository.GetUserByIdAsync(userId);
+            if (user == null)
+                throw new NotFoundException("User not found!");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+            await _authRepository.UpdateUserAsync(user);
+        }
+
+        public async Task AdminResetPasswordAsync(ResetPassAdminDto dto)
+        {
+            if (string.IsNullOrEmpty(dto.NewPassword)) throw new BadRequestException("please enter a new password!");
+
+            var user = await _authRepository.GetUserByIdAsync(dto.UserId);
+            if (user == null)
+                throw new NotFoundException("User not found!");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+            await _authRepository.UpdateUserAsync(user);
+        }
+
+        public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
+        {
+            var user = await _authRepository.GetUserByIdAsync(userId);
+            if (user == null)
+                throw new NotFoundException("User not found!");
+
+            bool isOldPasswordValid = BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash);
+            if (!isOldPasswordValid)
+                throw new BadRequestException("Old password is incorrect");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+            await _authRepository.UpdateUserAsync(user);
+
+        }
+*/
+/*------------------------------------------------------------------------------------------------------*/
     }
 }
