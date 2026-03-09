@@ -18,6 +18,8 @@ namespace EmpMS.Infrastructure
             services.AddScoped<IPrivilegeService, PrivilegeService>();
             services.AddScoped<IRolePrivilegeService, RolePrivilegeService>();
             services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IDepartmentService, DepartmentService>();
+            services.AddScoped<IDesignationService, DesignationService>();
 
             /* register automapper 13+ syntax */
             services.AddAutoMapper(cfg => { }, typeof(AutoMapperProfile));

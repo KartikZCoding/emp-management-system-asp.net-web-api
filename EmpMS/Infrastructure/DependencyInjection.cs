@@ -27,6 +27,8 @@ namespace EmpMS.Infrastructure
             services.AddScoped<IPrivilegeRepository, PrivilegeRepository>();
             services.AddScoped<IRolePrivilegeRepository, RolePrivilegeRepository>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+            services.AddScoped<IDesignationRepository, DesignationRepository>();
 
             services.AddScoped<IEmailService, EmailService>();
 

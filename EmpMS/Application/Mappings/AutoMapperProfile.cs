@@ -1,4 +1,6 @@
 using Application.DTOs.Auth;
+using Application.DTOs.Department;
+using Application.DTOs.Designation;
 using Application.DTOs.Employee;
 using AutoMapper;
 using Domain.Entities;
@@ -10,6 +12,14 @@ namespace Application.Mappings
         public AutoMapperProfile()
         {
             CreateMap<RoleDto, Role>().ReverseMap();
+
+            //Department mappings
+            CreateMap<DepartmentDto, Department>().ReverseMap();
+            CreateMap<Department, DepartmentResponseDto>();
+
+            //Designation mappings
+            CreateMap<DesignationDto, Designation>().ReverseMap();
+            CreateMap<Designation, DesignationResponseDto>();
 
             //Employee -> CreateEmployeeDto
             CreateMap<CreateEmployeeDto, Employee>().ReverseMap();
