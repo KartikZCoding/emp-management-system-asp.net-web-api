@@ -2,6 +2,7 @@ using Application.Common;
 using Application.DTOs.Auth;
 using Application.Interfaces;
 using Azure;
+using EmpMS.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -22,20 +23,23 @@ namespace EmpMS.Controllers
             _apiResponse = new();
         }
 
-        [AllowAnonymous]
-        [HttpPost("register")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HasPermission("User.Create")]
+        [HttpPost("create-user")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> RegisterAsync(RegisterDto registerDto)
+        public async Task<ActionResult<APIResponse>> CreateUser(CreateUserDto createUserDto)
         {
-            await _authService.RegisterAsync(registerDto);
+            string createdBy = User.FindFirst(ClaimTypes.Name)?.Value ?? "System";
 
-            _apiResponse.Data = "Successfull";
+            var result = await _authService.CreateUserAsync(createUserDto, createdBy);
+
+            _apiResponse.Data = result;
             _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            _apiResponse.StatusCode = HttpStatusCode.Created;
 
+            return StatusCode(StatusCodes.Status201Created, _apiResponse);
         }
 
         [AllowAnonymous]
@@ -136,6 +140,27 @@ namespace EmpMS.Controllers
 
         }
 
+
+        [Authorize]
+        [HttpPost("change-password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<APIResponse>> ChangePassword(ChangePasswordDto changePasswordDto)
+        {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            await _authService.ChangePasswordAsync(userId, changePasswordDto);
+
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+            _apiResponse.Data = "Successfull";
+            return Ok(_apiResponse);
+
+        }
+
         /*[Authorize]
         [HttpPost("user-reset-password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -174,26 +199,7 @@ namespace EmpMS.Controllers
             return Ok(_apiResponse);
 
         }
-
-        [Authorize]
-        [HttpPost("change-password")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> ChangePassword(ChangePasswordDto changePasswordDto)
-        {
-            int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            await _authService.ChangePasswordAsync(userId, changePasswordDto);
-
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            _apiResponse.Data = "Successfull";
-            return Ok(_apiResponse);
-
-        }*/
+        */
 
     }
 }
