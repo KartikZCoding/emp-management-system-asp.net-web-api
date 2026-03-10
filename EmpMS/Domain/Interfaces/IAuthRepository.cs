@@ -5,6 +5,8 @@ namespace Domain.Interfaces
     public interface IAuthRepository
     {
         Task<bool> UserExistAsync(string username);
+        Task<bool> EmailExistsAsync(string email);
+        Task<bool> EmployeeHasUserAsync(int employeeId);
         Task CreateUserAsync(User user);
         Task AddUserRoleAsync(UserRole userRole);
         Task<User?> GetUserByIdAsync(int id);

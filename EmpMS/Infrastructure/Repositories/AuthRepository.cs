@@ -18,6 +18,14 @@ namespace Infrastructure.Repositories
         {
             return await _appDbContext.Users.AnyAsync(u => u.Username == username);
         }
+        public Task<bool> EmailExistsAsync(string email)
+        {
+            return _appDbContext.Users.AnyAsync(u => u.Email == email);
+        }
+        public Task<bool> EmployeeHasUserAsync(int employeeId)
+        {
+            return _appDbContext.Users.AnyAsync(u => u.EmployeeId == employeeId);
+        }
 
         public async Task CreateUserAsync(User user)
         {
@@ -61,6 +69,7 @@ namespace Infrastructure.Repositories
             _appDbContext.Users.Update(user);
             await _appDbContext.SaveChangesAsync();
         }
+
 
     }
 }
