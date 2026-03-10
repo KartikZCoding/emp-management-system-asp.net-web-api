@@ -46,6 +46,15 @@ namespace Infrastructure.Repositories
         {
             return await _appDbContext.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
         }
+        public async Task<List<string>> GetUserPermissionsAsync(int userId)
+        {
+            return await _appDbContext.UserRoles
+                .Where(ur => ur.UserId == userId)
+                .SelectMany(ur => ur.Role.RolePrivileges)
+                .Select(rp => rp.Privilege.PrivilegeName)
+                .Distinct()
+                .ToListAsync();
+        }
 
         public async Task UpdateUserAsync(User user)
         {

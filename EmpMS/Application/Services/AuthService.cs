@@ -65,13 +65,11 @@ namespace Application.Services
             if (!verifyPassword)
                 throw new UnauthorizedException("Invalid password!");
 
-            var userRole = user.UserRoles.FirstOrDefault();
-            if (userRole == null)
-                throw new UnauthorizedException("User has no role assigned!");
-            var role = userRole.Role;
+            // NEW — fetch ALL privileges for the user's role(s)
+            var permissions = await _authRepository.GetUserPermissionsAsync(user.Id);
 
-            //generate both tokens
-            string token = _jwtHelper.GenerateToken(user.Id, user.Username, user.Email, role.RoleName);
+            // 4. Generate new tokens (token rotation)
+            string accessToken = _jwtHelper.GenerateToken(user.Id, user.Username, user.Email, permissions);
             string refreshToken = _jwtHelper.GenerateRefreshToken();
 
             //save refresh token to DB
@@ -83,9 +81,8 @@ namespace Application.Services
             {
                 Username = user.Username,
                 Email = user.Email,
-                Token = token,
+                Token = accessToken,
                 RefreshToken = refreshToken,
-                Role = role.RoleName
             };
 
             return loginResponse;
@@ -109,14 +106,11 @@ namespace Application.Services
             if (user == null || user.RefreshToken != dto.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
                 throw new UnauthorizedException("Invalid or expired refresh token");
 
-            // 3. Get user role
-            var fullUser = await _authRepository.GetUserByUsernameAsync(user.Username);
-            var role = fullUser.UserRoles.FirstOrDefault()?.Role;
-            if (role == null)
-                throw new UnauthorizedException("User has no role assigned");
+            // NEW — fetch ALL privileges for the user's role(s)
+            var permissions = await _authRepository.GetUserPermissionsAsync(userId);
 
             // 4. Generate new tokens (token rotation)
-            string newAccessToken = _jwtHelper.GenerateToken(user.Id, user.Username, user.Email, role.RoleName);
+            string newAccessToken = _jwtHelper.GenerateToken(user.Id, user.Username, user.Email, permissions);
             string newRefreshToken = _jwtHelper.GenerateRefreshToken();
 
             // 5. Save new refresh token (invalidates old one)
@@ -126,11 +120,10 @@ namespace Application.Services
 
             return new LoginResponseDto
             {
-                Token = newAccessToken,
-                RefreshToken = newRefreshToken,
                 Username = user.Username,
                 Email = user.Email,
-                Role = role.RoleName
+                Token = newAccessToken,
+                RefreshToken = newRefreshToken,
             };
         }
 

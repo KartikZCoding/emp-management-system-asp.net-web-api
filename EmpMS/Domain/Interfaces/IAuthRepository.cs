@@ -10,6 +10,7 @@ namespace Domain.Interfaces
         Task<User?> GetUserByIdAsync(int id);
         Task<User?> GetUserByUsernameAsync(string username);
         Task<User?> GetUserByEmailAsync(string email);
+        Task<List<string>> GetUserPermissionsAsync(int userId);
         Task UpdateUserAsync(User user);
     }
 }
