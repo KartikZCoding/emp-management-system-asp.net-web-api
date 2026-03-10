@@ -1,6 +1,7 @@
 using Application.Common;
 using Application.DTOs.Auth;
 using Application.Interfaces;
+using EmpMS.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -9,7 +10,7 @@ namespace EmpMS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [HasPermission("Privilege.Manage")]
     public class PrivilegesController : ControllerBase
     {
         private readonly IPrivilegeService _privilegeService;

@@ -1,6 +1,7 @@
 ﻿using Application.Common;
 using Application.DTOs.Employee;
 using Application.Interfaces;
+using EmpMS.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -26,7 +27,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "HR,Admin")]
+        [HasPermission("Employee.Read")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> GetAllEmployees(
             [FromQuery] int page = 1,
@@ -44,7 +45,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "HR,Admin")]
+        [HasPermission("Employee.Read")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> GetEmployeeById(int id)
         {
@@ -58,7 +59,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "HR,Admin")]
+        [HasPermission("Employee.Create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> CreateEmployee(CreateEmployeeDto dto)
         {
@@ -72,7 +73,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "HR,Admin")]
+        [HasPermission("Employee.Update")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> UpdateEmployee(int id, UpdateEmployeeDto dto)
         {
@@ -86,7 +87,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]       // only Admin can delete
+        [HasPermission("Employee.Delete")]// only Admin can delete
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> DeleteEmployee(int id)
         {
@@ -100,7 +101,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpGet("search")]
-        [Authorize(Roles = "HR,Admin")]
+        [HasPermission("Employee.Read")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> SearchEmployees(
             [FromQuery] string? name,
@@ -117,7 +118,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpGet("department/{deptId}")]
-        [Authorize(Roles = "HR,Admin,Manager")]
+        [HasPermission("Employee.Read")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> GetByDepartment(int deptId)
         {
@@ -131,7 +132,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpGet("manager/{managerId}")]
-        [Authorize(Roles = "Manager")]
+        [HasPermission("Employee.Read")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> GetByManager(int managerId)
         {
@@ -143,7 +144,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpGet("me")]
-        [Authorize]     // any authenticated user
+        [Authorize]// any authenticated user
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> GetOwnProfile()
         {
@@ -177,7 +178,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpPost("{id}/photo")]
-        [Authorize(Roles = "HR,Admin")]
+        [HasPermission("Employee.Update")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> UploadPhoto(int id, IFormFile file)
         {
@@ -192,7 +193,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpGet("{id}/photo")]
-        [AllowAnonymous]  // photos can be viewed without login
+        [HasPermission("Employee.Read")]// photos can be viewed without login
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPhoto(int id)
         {

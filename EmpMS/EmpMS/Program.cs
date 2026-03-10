@@ -2,12 +2,14 @@ using Application.Interfaces;
 using Application.Mappings;
 using Application.Services;
 using Domain.Interfaces;
+using EmpMS.Authorization;
 using EmpMS.Infrastructure;
 using EmpMS.Middleware;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -129,6 +131,12 @@ builder.Services.AddAuthentication(options =>
 
 /*automapper registered AutoMapper 13+ syntax*/
 builder.Services.AddAutoMapper(cfg => { }, typeof(AutoMapperProfile));
+
+/*Register the permission handler*/
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
+
+/*Register the dynamic policy provider (replaces the default one)*/
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
 
 var app = builder.Build();

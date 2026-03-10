@@ -1,6 +1,7 @@
 using Application.Common;
 using Application.DTOs.Designation;
 using Application.Interfaces;
+using EmpMS.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -22,6 +23,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpGet]
+        [HasPermission("Designation.Read")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -36,6 +38,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpGet("{id}")]
+        [HasPermission("Designation.Read")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -52,7 +55,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,HR")]
+        [HasPermission("Designation.Create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -69,7 +72,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,HR")]
+        [HasPermission("Designation.Update")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -87,7 +90,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [HasPermission("Designation.Delete")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
