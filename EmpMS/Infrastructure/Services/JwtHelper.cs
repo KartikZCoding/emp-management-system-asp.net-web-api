@@ -18,7 +18,7 @@ namespace Infrastructure.Services
             _configuration = configuration;
         }
 
-        public string GenerateToken(int userId, string username, string email, string rolename)
+        public string GenerateToken(int userId, string username, string email, List<string> permissions)
         {
             var privateKey = File.ReadAllText(_configuration["Jwt:PrivateKeyPath"]);
 
@@ -33,8 +33,13 @@ namespace Infrastructure.Services
                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
                new Claim(ClaimTypes.Name, username),
                new Claim(ClaimTypes.Email, email),
-               new Claim(ClaimTypes.Role, rolename),
             };
+
+            // Add each permission as a separate claim
+            foreach (var permission in permissions)
+            {
+                claims.Add(new Claim("Permission", permission));
+            }
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
