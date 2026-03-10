@@ -24,6 +24,14 @@ namespace Infrastructure.Data.Configurations
             builder.Property(u => u.CreatedAt).HasDefaultValueSql("GETDATE()");
             builder.Property(u => u.RefreshToken).HasMaxLength(256);
 
+            builder.Property(u => u.MustChangePassword).HasDefaultValue(false);
+            builder.Property(u => u.CreatedBy).HasMaxLength(50);
+
+            builder.HasOne(u => u.Employee)
+                .WithOne()
+                .HasForeignKey<User>(u => u.EmployeeId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             builder.HasData(new User
             {
                 Id = 1,
@@ -31,6 +39,7 @@ namespace Infrastructure.Data.Configurations
                 Email = "Admin123@gmail.com",
                 PasswordHash = "$2a$11$3TiXqeZZ1dUHslmgkYVDUusIDqGmV3Yv/E7n2iAhNI46Gvq20aAFy",
                 IsActive = true,
+                MustChangePassword = false,
                 //CreatedAt = DateTime.Now
             });
         }
