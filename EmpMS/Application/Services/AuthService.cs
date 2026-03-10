@@ -12,47 +12,88 @@ namespace Application.Services
     {
         private readonly IAuthRepository _authRepository;
         private readonly IRoleRepository _roleRepository;
+        private readonly IEmployeeRepository _employeeRepository;
         private readonly IJwtHelper _jwtHelper;
         private readonly IMemoryCache _cache;
         private readonly IEmailService _emailService;
 
-        public AuthService(IAuthRepository authRepository, IRoleRepository roleRepository, IJwtHelper jwtHelper, IMemoryCache cache, IEmailService emailService)
+        public AuthService(IAuthRepository authRepository, IRoleRepository roleRepository, IEmployeeRepository employeeRepository, IJwtHelper jwtHelper, IMemoryCache cache, IEmailService emailService)
         {
             _authRepository = authRepository;
             _roleRepository = roleRepository;
+            _employeeRepository = employeeRepository;
             _jwtHelper = jwtHelper;
             _cache = cache;
             _emailService = emailService;
         }
 
-        public async Task RegisterAsync(RegisterDto dto)
+        public async Task<CreateUserResponseDto> CreateUserAsync(CreateUserDto dto, string createdBy)
         {
+            // 1. Validate username uniqueness
             if (await _authRepository.UserExistAsync(dto.Username))
-                throw new BadRequestException("User already exists!");
+                throw new BadRequestException("Username already exists!");
+            // 2. Validate email uniqueness
+            if (await _authRepository.EmailExistsAsync(dto.Email))
+                throw new BadRequestException("Email already exists!");
+            // 3. If EmployeeId given, validate it
+            if (dto.EmployeeId.HasValue)
+            {
+                var employee = await _employeeRepository.GetByIdAsync(dto.EmployeeId.Value);
+                if (employee == null)
+                    throw new NotFoundException("Employee not found!");
+                if (await _authRepository.EmployeeHasUserAsync(dto.EmployeeId.Value))
+                    throw new BadRequestException("This employee already has a user account!");
+            }
 
-            string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
-
+            // 4. Generate temporary password
+            string tempPassword = GenerateTemporaryPassword();
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
+            // 5. Create user
             var user = new User
             {
                 Username = dto.Username,
                 Email = dto.Email,
                 PasswordHash = passwordHash,
                 IsActive = true,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                EmployeeId = dto.EmployeeId,
+                MustChangePassword = true,
+                CreatedBy = createdBy
             };
 
             await _authRepository.CreateUserAsync(user);
 
-            // 5. Assign Default Role "Employee"
-            var role = await _roleRepository.GetRoleByNameAsync("Employee");
-            if (role == null) throw new NotFoundException("Default role 'Employee' not found.");
-            var userRole = new UserRole
+            // 6. Assign roles
+            var roleNames = new List<string>();
+            foreach (var roleId in dto.RoleIds)
+            {
+                var role = await _roleRepository.GetRoleByIdAsync(roleId);
+                if (role == null) throw new NotFoundException($"Role with ID {roleId} not found!");
+                await _authRepository.AddUserRoleAsync(new UserRole
+                {
+                    UserId = user.Id,
+                    RoleId = roleId
+                });
+                roleNames.Add(role.RoleName);
+            }
+            // 7. Send welcome email with temp password
+            string subject = "Your EmpMS Account Has Been Created";
+            string body = $"Hello,\n\n"
+                + $"Your account has been created in the Employee Management System.\n\n"
+                + $"Username: {dto.Username}\n"
+                + $"Temporary Password: {tempPassword}\n\n"
+                + $"Please login and change your password immediately.\n\n"
+                + $"Regards,\nAdmin Team";
+            await _emailService.SendEmailAsync(dto.Email, subject, body);
+            // 8. Return response
+            return new CreateUserResponseDto
             {
                 UserId = user.Id,
-                RoleId = role.Id
+                Username = user.Username,
+                Email = user.Email,
+                Roles = roleNames,
+                EmployeeId = user.EmployeeId
             };
-
-            await _authRepository.AddUserRoleAsync(userRole);
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
@@ -83,6 +124,7 @@ namespace Application.Services
                 Email = user.Email,
                 Token = accessToken,
                 RefreshToken = refreshToken,
+                MustChangePassword = user.MustChangePassword
             };
 
             return loginResponse;
@@ -92,7 +134,7 @@ namespace Application.Services
         {
             // 1. Extract claims from the expired access token
             var principal = _jwtHelper.GetPrincipalFromExpiredToken(dto.AccessToken);
-            if(principal == null)
+            if (principal == null)
                 throw new UnauthorizedException("Invalid access token!");
 
             var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -173,35 +215,6 @@ namespace Application.Services
             _cache.Remove(resetPasswordDto.Email);
         }
 
-/* Don't used */
-/*------------------------------------------------------------------------------------------------------*/
-/*
-        public async Task UserResetPasswordAsync(int userId, ResetPassUserDto dto)
-        {
-            if (string.IsNullOrEmpty(dto.NewPassword)) throw new BadRequestException("please enter a new password!");
-
-            var user = await _authRepository.GetUserByIdAsync(userId);
-            if (user == null)
-                throw new NotFoundException("User not found!");
-
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-
-            await _authRepository.UpdateUserAsync(user);
-        }
-
-        public async Task AdminResetPasswordAsync(ResetPassAdminDto dto)
-        {
-            if (string.IsNullOrEmpty(dto.NewPassword)) throw new BadRequestException("please enter a new password!");
-
-            var user = await _authRepository.GetUserByIdAsync(dto.UserId);
-            if (user == null)
-                throw new NotFoundException("User not found!");
-
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-
-            await _authRepository.UpdateUserAsync(user);
-        }
-
         public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
         {
             var user = await _authRepository.GetUserByIdAsync(userId);
@@ -217,7 +230,59 @@ namespace Application.Services
             await _authRepository.UpdateUserAsync(user);
 
         }
-*/
-/*------------------------------------------------------------------------------------------------------*/
+
+        /* Don't used */
+        /*------------------------------------------------------------------------------------------------------*/
+        /*
+                public async Task UserResetPasswordAsync(int userId, ResetPassUserDto dto)
+                {
+                    if (string.IsNullOrEmpty(dto.NewPassword)) throw new BadRequestException("please enter a new password!");
+
+                    var user = await _authRepository.GetUserByIdAsync(userId);
+                    if (user == null)
+                        throw new NotFoundException("User not found!");
+
+                    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+                    await _authRepository.UpdateUserAsync(user);
+                }
+
+                public async Task AdminResetPasswordAsync(ResetPassAdminDto dto)
+                {
+                    if (string.IsNullOrEmpty(dto.NewPassword)) throw new BadRequestException("please enter a new password!");
+
+                    var user = await _authRepository.GetUserByIdAsync(dto.UserId);
+                    if (user == null)
+                        throw new NotFoundException("User not found!");
+
+                    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+                    await _authRepository.UpdateUserAsync(user);
+                }
+        */
+        /*------------------------------------------------------------------------------------------------------*/
+
+        private string GenerateTemporaryPassword(int length = 12)
+        {
+            const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+            const string lower = "abcdefghijkmnpqrstuvwxyz";
+            const string digits = "23456789";
+            const string special = "!@#$%";
+            var random = new Random();
+            var password = new List<char>
+            {
+                upper[random.Next(upper.Length)],
+                lower[random.Next(lower.Length)],
+                digits[random.Next(digits.Length)],
+                special[random.Next(special.Length)]
+            };
+            string allChars = upper + lower + digits + special;
+            for (int i = password.Count; i < length; i++)
+            {
+                password.Add(allChars[random.Next(allChars.Length)]);
+            }
+            // Shuffle
+            return new string(password.OrderBy(_ => random.Next()).ToArray());
+        }
     }
 }
