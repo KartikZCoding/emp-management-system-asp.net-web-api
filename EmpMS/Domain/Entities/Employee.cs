@@ -30,5 +30,6 @@ namespace Domain.Entities
         public Designation Designation { get; set; } //each employee has one designation
         public Employee? Manager { get; set; } //each employee may have one manager
         public ICollection<Employee> Subordinates { get; set; } //a manager can have many subordinates
+        public ICollection<Attendance> Attendances { get; set; }
     }
 }
