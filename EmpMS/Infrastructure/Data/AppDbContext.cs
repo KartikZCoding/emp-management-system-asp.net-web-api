@@ -21,6 +21,8 @@ namespace Infrastructure.Data
         public DbSet<Department> Departments { get; set; }
         public DbSet<Designation> Designations { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<Attendance> Attendances { get; set; }
+        public DbSet<AttendanceLog> AttendanceLogs { get; set; }
 
         //Configurations
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -33,6 +35,8 @@ namespace Infrastructure.Data
             modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new DesignationConfiguration());
             modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
+            modelBuilder.ApplyConfiguration(new AttendanceConfiguration());
+            modelBuilder.ApplyConfiguration(new AttendanceLogConfiguration());
         }
     }
 }
