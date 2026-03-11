@@ -61,14 +61,13 @@ namespace Application.Services
                 CreatedBy = createdBy
             };
 
-            await _authRepository.CreateUserAsync(user);
-
             // 6. Assign roles
             var roleNames = new List<string>();
             foreach (var roleId in dto.RoleIds)
             {
                 var role = await _roleRepository.GetRoleByIdAsync(roleId);
                 if (role == null) throw new NotFoundException($"Role with ID {roleId} not found!");
+                await _authRepository.CreateUserAsync(user);
                 await _authRepository.AddUserRoleAsync(new UserRole
                 {
                     UserId = user.Id,
@@ -76,6 +75,7 @@ namespace Application.Services
                 });
                 roleNames.Add(role.RoleName);
             }
+
             // 7. Send welcome email with temp password
             string subject = "Your EmpMS Account Has Been Created";
             string body = $"Hello,\n\n"
@@ -226,6 +226,7 @@ namespace Application.Services
                 throw new BadRequestException("Old password is incorrect");
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            user.MustChangePassword = false;
 
             await _authRepository.UpdateUserAsync(user);
 
