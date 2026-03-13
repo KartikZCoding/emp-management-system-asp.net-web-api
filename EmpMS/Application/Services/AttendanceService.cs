@@ -39,6 +39,7 @@ namespace Application.Services
             if(attendance != null)
             {
                 var openLog = attendance.AttendanceLogs.FirstOrDefault(l => l.CheckOut == null);
+                if (openLog != null) throw new BadRequestException("You are already checked in! check out first.");
 
                 var newLog = new AttendanceLog
                 {
@@ -58,7 +59,28 @@ namespace Application.Services
                 return _mapper.Map<AttendanceResponseDto>(attendance);
             }
 
-            
+            var newAttendance = new Attendance
+            {
+                EmployeeId = employee.Id,
+                Date = today,
+                Status = DateTime.Now.TimeOfDay > new TimeSpan(10, 15, 0) ? "Late" : "Present",
+                IsCheckedIn = true,
+                TotalHours = null,
+                CreatedAt = DateTime.Now
+            };
+            var firstLog = new AttendanceLog
+            {
+                AttendanceId = newAttendance.Id,
+                CheckIn = DateTime.Now,
+                CheckOut = null,
+                SessionHours = null,
+                CreatedAt = DateTime.Now
+            };
+
+            await _attendanceRepository.CreateAsync(newAttendance);
+            await _attendanceRepository.CreateLogAsync(firstLog);
+
+            return _mapper.Map<AttendanceResponseDto>(newAttendance);
 
         }
 
@@ -82,10 +104,13 @@ namespace Application.Services
             attendance.IsCheckedIn = false;
             if(attendance.TotalHours < 5)
             {
-                attendance.Status = 
+                attendance.Status = "HalfDay";
             }
+            attendance.UpdatedAt = DateTime.Now;
 
+            await _attendanceRepository.UpdateAsync(attendance);
 
+            return _mapper.Map<AttendanceResponseDto>(attendance);
         }
 
         public Task<List<AttendanceResponseDto>> GetDepartmentAttendanceAsync(int deptId, DateOnly? date)
