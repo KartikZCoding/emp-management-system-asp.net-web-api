@@ -10,7 +10,7 @@ namespace EmpMS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [HasPermission("Role.Manage")]
+    //[HasPermission("Role.Manage")]
     public class RolesController : ControllerBase
     {
         private readonly IRoleService _roleService;
