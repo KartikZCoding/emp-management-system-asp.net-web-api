@@ -1,3 +1,4 @@
+using Application.DTOs.Attendance;
 using Application.DTOs.Auth;
 using Application.DTOs.Department;
 using Application.DTOs.Designation;
@@ -40,6 +41,13 @@ namespace Application.Mappings
 
             //UpdateOwnProfileDto -> Employee
             CreateMap<UpdateOwnProfileDto, Employee>().ReverseMap();
+
+            //Attendance mappings
+            CreateMap<AttendanceLog, AttendanceLogResponseDto>();
+
+            CreateMap<Attendance, AttendanceResponseDto>()
+                .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.FirstName + " " + src.Employee.LastName))
+                .ForMember(dest => dest.Logs, opt => opt.MapFrom(src => src.AttendanceLogs));
 
         }
     }
