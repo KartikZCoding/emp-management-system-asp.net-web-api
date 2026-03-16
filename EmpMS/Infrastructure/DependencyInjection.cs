@@ -29,6 +29,7 @@ namespace EmpMS.Infrastructure
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             services.AddScoped<IDepartmentRepository, DepartmentRepository>();
             services.AddScoped<IDesignationRepository, DesignationRepository>();
+            services.AddScoped<IAttendanceRepository, AttendanceRepository>();
 
             services.AddScoped<IEmailService, EmailService>();
 
