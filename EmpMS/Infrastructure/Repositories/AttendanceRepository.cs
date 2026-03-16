@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +27,10 @@ namespace Infrastructure.Repositories
         }
         public async Task<Attendance?> GetByIdAsync(int id)
         {
-            return await _appDbContext.Attendances.FirstOrDefaultAsync(a => a.Id == id);
+            return await _appDbContext.Attendances
+                .Include(a => a.AttendanceLogs)
+                .Include(a => a.Employee)
+                .FirstOrDefaultAsync(a => a.Id == id);
         }
 
         public async Task<List<Attendance>> GetByEmployeeMonthlyAsync(int empId, int month, int year)

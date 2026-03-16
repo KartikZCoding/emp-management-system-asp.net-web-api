@@ -10,6 +10,7 @@ namespace Domain.Entities
         public int EmployeeId { get; set; }
         public DateOnly Date { get; set; }
         public decimal? TotalHours { get; set; }
+        public bool IsLate { get; set; }
         public string Status { get; set; }
         public bool IsCheckedIn { get; set; }
         public DateTime CreatedAt { get; set; }

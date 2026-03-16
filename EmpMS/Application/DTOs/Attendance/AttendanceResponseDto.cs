@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,7 +12,8 @@ namespace Application.DTOs.Attendance
         public DateOnly Date { get; set; }
         public decimal? TotalHours { get; set; }
         public string Status { get; set; }
+        public bool IsLate { get; set; }
         public bool IsCheckedIn { get; set; }
-        public List<AttendanceResponseDto> Logs { get; set; }
+        public List<AttendanceLogResponseDto> Logs { get; set; }
     }
 }

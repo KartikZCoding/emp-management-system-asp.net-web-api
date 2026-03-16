@@ -51,6 +51,7 @@ namespace Application.Services
                 };
 
                 attendance.IsCheckedIn = true;
+                attendance.Status = "Present";
                 attendance.UpdatedAt = DateTime.Now;
 
                 await _attendanceRepository.CreateLogAsync(newLog);
@@ -63,7 +64,8 @@ namespace Application.Services
             {
                 EmployeeId = employee.Id,
                 Date = today,
-                Status = DateTime.Now.TimeOfDay > new TimeSpan(10, 15, 0) ? "Late" : "Present",
+                IsLate = DateTime.Now.TimeOfDay > new TimeSpan(10, 15, 0),
+                Status = "Present",
                 IsCheckedIn = true,
                 TotalHours = null,
                 CreatedAt = DateTime.Now
@@ -154,11 +156,11 @@ namespace Application.Services
                     var employee = records.First().Employee;
 
                     int totalPresent = records.Count(a => a.Status == "Present");
-                    int totalLate = records.Count(a => a.Status == "Late");
+                    int totalLate = records.Count(a => a.IsLate);
                     int totalHalfDays = records.Count(a => a.Status == "HalfDay");
                     int totalOnLeave = records.Count(a => a.Status == "OnLeave");
 
-                    int totalAbsent = workingDays - (totalPresent + totalLate + totalHalfDays + totalOnLeave);
+                    int totalAbsent = workingDays - (totalPresent + totalHalfDays + totalOnLeave);
 
                     decimal totalWorkHours = records.Sum(a => a.TotalHours ?? 0);
                     int workedDaysCount = records.Count(a => a.TotalHours > 0);
@@ -214,15 +216,19 @@ namespace Application.Services
                 TotalEmployees = totalActiveEmployees,
                 TotalCheckedIn = allToday.Count,
                 TotalPresent = allToday.Count(a => a.Status == "Present"),
-                TotalLate = allToday.Count(a => a.Status == "Late"),
+                TotalLate = allToday.Count(a => a.IsLate),
                 CurrentlyInOffice = allToday.Count(a => a.IsCheckedIn),
                 TotalAbsent = totalActiveEmployees - allToday.Count
             };
         }
 
-        public async Task<AttendanceResponseDto> UpdateAttendanceAsync(int id, AttendanceUpdateDto dto)
+        public async Task<AttendanceResponseDto> UpdateAttendanceAsync(int id, AttendanceUpdateDto dto, string updateBy)
         {
             if (id <= 0) throw new BadRequestException("Invalid id!");
+
+            var validStatuses = new[] { "Present", "HalfDay", "OnLeave" };
+            if (!validStatuses.Contains(dto.Status))
+                throw new BadRequestException("Invalid status! Use: Present, HalfDay, or OnLeave");
 
             var attendance = await _attendanceRepository.GetByIdAsync(id);
             if (attendance == null) throw new NotFoundException("Attendance not found!");
@@ -231,6 +237,7 @@ namespace Application.Services
             {
                 attendance.Status = dto.Status;
             }
+            attendance.UpdatedBy = updateBy;
             attendance.UpdatedAt = DateTime.Now;
 
             await _attendanceRepository.UpdateAsync(attendance);
