@@ -120,6 +120,7 @@ namespace Application.Services
         {
             DateOnly targetDate = date ?? DateOnly.FromDateTime(DateTime.Now);
             var attendances = await _attendanceRepository.GetByDepartmentAndDateAsync(deptId, targetDate);
+            if (attendances.Count == 0) throw new NotFoundException("No, attendances found! related to this department ID!");
 
             return _mapper.Map<List<AttendanceResponseDto>>(attendances);
         }
@@ -132,6 +133,7 @@ namespace Application.Services
             var targetYear = year ?? DateTime.Now.Year;
 
             var attendaces = await _attendanceRepository.GetByEmployeeMonthlyAsync(empId, targetMonth, targetYear);
+            if (attendaces.Count == 0) throw new NotFoundException("No, attendances found! related to this Employee ID!");
 
             return _mapper.Map<List<AttendanceResponseDto>>(attendaces);
         }
@@ -142,6 +144,7 @@ namespace Application.Services
             var targetYear = year ?? DateTime.Now.Year;
 
             var attendances = await _attendanceRepository.GetMonthlyAllAsync(targetMonth, targetYear);
+            if (attendances.Count == 0) throw new NotFoundException("No, attendances found!");
 
             int totalDaysInMonth = DateTime.DaysInMonth(targetYear, targetMonth);
             int workingDays = Enumerable.Range(1, totalDaysInMonth)
@@ -198,6 +201,7 @@ namespace Application.Services
             var targetYear = year ?? DateTime.Now.Year;
 
             var attendances = await _attendanceRepository.GetByEmployeeMonthlyAsync(employee.Id, targetMonth, targetYear);
+            if (attendances.Count == 0) throw new NotFoundException("No, attendances found!");
 
             return _mapper.Map<List<AttendanceResponseDto>>(attendances);
         }
