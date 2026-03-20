@@ -23,6 +23,7 @@ namespace Infrastructure.Data
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<AttendanceLog> AttendanceLogs { get; set; }
+        public DbSet<AttendanceRegularization> AttendanceRegularizations { get; set; }
 
         //Configurations
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,6 +38,7 @@ namespace Infrastructure.Data
             modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
             modelBuilder.ApplyConfiguration(new AttendanceConfiguration());
             modelBuilder.ApplyConfiguration(new AttendanceLogConfiguration());
+            modelBuilder.ApplyConfiguration(new AttendanceRegularizationConfiguration());
         }
     }
 }
