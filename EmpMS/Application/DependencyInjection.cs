@@ -21,6 +21,7 @@ namespace EmpMS.Infrastructure
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IDesignationService, DesignationService>();
             services.AddScoped<IAttendanceService, AttendanceService>();
+            services.AddScoped<IAttendanceRegularizationService, AttendanceRegularizationService>();
 
             /* register automapper 13+ syntax */
             services.AddAutoMapper(cfg => { }, typeof(AutoMapperProfile));
