@@ -93,5 +93,19 @@ namespace Infrastructure.Repositories
         {
             return await _appDbContext.Employees.CountAsync(e => e.IsActive);
         }
+
+        public async Task<List<Attendance>> GetMissedCheckoutsAsync(int employeeId)
+        {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            return await _appDbContext.Attendances
+                .Include(a => a.AttendanceLogs)
+                .Include(a => a.Employee)
+                .Where(a => a.EmployeeId == employeeId
+                       && a.Date < today   // exclude today — employee is still working!
+                       && a.AttendanceLogs.Any(l => l.CheckOut == null))
+                .OrderByDescending(a => a.Date)
+                .ToListAsync();
+        }
     }
 }

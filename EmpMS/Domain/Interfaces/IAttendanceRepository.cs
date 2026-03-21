@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,6 +18,7 @@ namespace Domain.Interfaces
         Task CreateLogAsync(AttendanceLog log);
         Task UpdateLogAsync(AttendanceLog log);
         Task<int> GetActiveEmployeeCountAsync();
+        Task<List<Attendance>> GetMissedCheckoutsAsync(int employeeId);
 
     }
 }
