@@ -21,6 +21,10 @@ namespace Infrastructure.Data.Configurations
             builder.Property(ar => ar.RequestedCheckOut).IsRequired();
             builder.Property(ar => ar.CreatedAt).IsRequired();
 
+            builder.Property(ar => ar.DecisionDate).IsRequired(false);
+            builder.Property(ar => ar.DecisionNote).IsRequired(false).HasMaxLength(500);
+            builder.Property(ar => ar.HRorAdminId).IsRequired(false);
+
             builder.HasOne(ar => ar.Employee)
                 .WithMany()
                 .HasForeignKey(ar => ar.EmployeeId)
