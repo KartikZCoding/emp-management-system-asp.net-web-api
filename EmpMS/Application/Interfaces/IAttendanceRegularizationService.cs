@@ -1,4 +1,4 @@
-﻿using Application.DTOs.Attendance;
+using Application.DTOs.Attendance;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,5 +12,6 @@ namespace Application.Interfaces
         Task<List<AttendanceRegularizationResponseDto>> GetPendingRequestsAsync();
         Task<AttendanceRegularizationResponseDto> ApproveAsync(int requestId, int hrUserId, string? decisionNote);
         Task<AttendanceRegularizationResponseDto> RejectAsync(int requestId, int hrUserId, string? decisionNote);
+        Task<List<AttendanceResponseDto>> GetMissedCheckoutsAsync(string employeeEmail);
     }
 }

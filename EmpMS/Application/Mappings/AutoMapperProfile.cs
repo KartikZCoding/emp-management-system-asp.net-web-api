@@ -49,6 +49,9 @@ namespace Application.Mappings
                 .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.FirstName + " " + src.Employee.LastName))
                 .ForMember(dest => dest.Logs, opt => opt.MapFrom(src => src.AttendanceLogs));
 
+            // Attendance Regularization mappings
+            CreateMap<AttendanceRegularization, AttendanceRegularizationResponseDto>();
+
         }
     }
 }
