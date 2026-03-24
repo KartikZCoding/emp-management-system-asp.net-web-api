@@ -1,4 +1,4 @@
-﻿using Application.Interfaces;
+using Application.Interfaces;
 using Application.Services;
 using Domain.Interfaces;
 using Infrastructure.Data;
@@ -31,6 +31,7 @@ namespace EmpMS.Infrastructure
             services.AddScoped<IDesignationRepository, DesignationRepository>();
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
             services.AddScoped<IAttendanceRegularizationRepository, AttendanceRegularizationRepository>();
+            services.AddScoped<ILeaveRepository, LeaveRepository>();
 
             services.AddScoped<IEmailService, EmailService>();
 
