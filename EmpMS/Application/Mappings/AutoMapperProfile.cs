@@ -3,6 +3,7 @@ using Application.DTOs.Auth;
 using Application.DTOs.Department;
 using Application.DTOs.Designation;
 using Application.DTOs.Employee;
+using Application.DTOs.Leave;
 using AutoMapper;
 using Domain.Entities;
 
@@ -51,6 +52,19 @@ namespace Application.Mappings
 
             // Attendance Regularization mappings
             CreateMap<AttendanceRegularization, AttendanceRegularizationResponseDto>();
+
+            // Leave Type mappings
+            CreateMap<LeaveTypeDto, LeaveType>().ReverseMap();
+            CreateMap<LeaveType, LeaveTypeResponseDto>();
+
+            // Leave Balance mappings
+            CreateMap<LeaveBalance, LeaveBalanceResponseDto>()
+                .ForMember(dest => dest.LeaveTypeName, opt => opt.MapFrom(src => src.LeaveType.Name));
+
+            // Leave Request mappings
+            CreateMap<LeaveRequest, LeaveRequestResponseDto>()
+                .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.FirstName + " " + src.Employee.LastName))
+                .ForMember(dest => dest.LeaveTypeName, opt => opt.MapFrom(src => src.LeaveType.Name));
 
         }
     }

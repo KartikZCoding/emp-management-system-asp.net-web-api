@@ -1,4 +1,4 @@
-﻿using Application.Interfaces;
+using Application.Interfaces;
 using Application.Mappings;
 using Application.Services;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +22,7 @@ namespace EmpMS.Infrastructure
             services.AddScoped<IDesignationService, DesignationService>();
             services.AddScoped<IAttendanceService, AttendanceService>();
             services.AddScoped<IAttendanceRegularizationService, AttendanceRegularizationService>();
+            services.AddScoped<ILeaveService, LeaveService>();
 
             /* register automapper 13+ syntax */
             services.AddAutoMapper(cfg => { }, typeof(AutoMapperProfile));
