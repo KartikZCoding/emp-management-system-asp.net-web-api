@@ -25,6 +25,10 @@ namespace Infrastructure.Data
         public DbSet<AttendanceLog> AttendanceLogs { get; set; }
         public DbSet<AttendanceRegularization> AttendanceRegularizations { get; set; }
 
+        public DbSet<LeaveType> LeaveTypes { get; set; }
+        public DbSet<LeaveBalance> LeaveBalances { get; set; }
+        public DbSet<LeaveRequest> LeaveRequests { get; set; }
+
         //Configurations
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +43,9 @@ namespace Infrastructure.Data
             modelBuilder.ApplyConfiguration(new AttendanceConfiguration());
             modelBuilder.ApplyConfiguration(new AttendanceLogConfiguration());
             modelBuilder.ApplyConfiguration(new AttendanceRegularizationConfiguration());
+            modelBuilder.ApplyConfiguration(new LeaveTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new LeaveBalanceConfiguration());
+            modelBuilder.ApplyConfiguration(new LeaveRequestConfiguration());
         }
     }
 }
