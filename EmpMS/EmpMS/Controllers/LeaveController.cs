@@ -139,7 +139,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpGet("requests/pending")]
-        [HasPermission("Leave.Update")]
+        [HasPermission("LeaveRequest.Update")]
         public async Task<ActionResult<APIResponse>> GetPendingRequests()
         {
             var response = await _leaveService.GetPendingRequestAsync();
@@ -151,7 +151,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpPut("requests/{id}/approve")]
-        [HasPermission("Leave.Update")]
+        [HasPermission("LeaveRequest.Update")]
         public async Task<ActionResult<APIResponse>> ApproveLeave(int id, [FromQuery] string? decisionNote)
         {
             var userId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -165,7 +165,7 @@ namespace EmpMS.Controllers
         }
 
         [HttpPut("requests/{id}/reject")]
-        [HasPermission("Leave.Update")]
+        [HasPermission("LeaveRequest.Update")]
         public async Task<ActionResult<APIResponse>> RejectLeave(int id, [FromQuery] string? decisionNote)
         {
             var userId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);

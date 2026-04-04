@@ -152,6 +152,25 @@ namespace Application.Services
             return _mapper.Map<LeaveRequestResponseDto>(created);
         }
 
+        public async Task<List<LeaveRequestResponseDto>> GetMyRequestsAsync(string employeeEmail)
+        {
+            var employee = await _employeeRepository.GetByEmailAsync(employeeEmail);
+            if (employee == null) throw new NotFoundException("Employee profile not found!");
+
+            var requests = await _leaveRepository.GetRequestsByEmployeeAsync(employee.Id);
+            if (requests.Count == 0) throw new NotFoundException("No leave requests found!");
+
+            return _mapper.Map<List<LeaveRequestResponseDto>>(requests);
+        }
+
+        public async Task<List<LeaveRequestResponseDto>> GetPendingRequestAsync()
+        {
+            var requests = await _leaveRepository.GetPendingRequestAsync();
+            if (requests.Count == 0) throw new NotFoundException("No pending leave requests found!");
+
+            return _mapper.Map<List<LeaveRequestResponseDto>>(requests);
+        }
+
         public async Task<LeaveRequestResponseDto> ApproveLeaveAsync(int requestId, int hrUserId, string? decisionNote)
         {
             var request = await _leaveRepository.GetRequestByIdAsync(requestId);
@@ -181,7 +200,7 @@ namespace Application.Services
             var employeeName = request.Employee.FirstName + " " + request.Employee.LastName;
             await _emailService.SendEmailAsync(
                 request.Employee.Email,
-                "Leave Approved ✅",
+                "Leave Approved",
                 $"Dear {employeeName},\n\n" +
                 $"Your {request.LeaveType.Name} request from {request.StartDate:dd-MMM-yyyy} to {request.EndDate:dd-MMM-yyyy} ({request.TotalDays} days) has been APPROVED.\n\n" +
                 $"HR Note: {decisionNote ?? "N/A"}\n\n" +
@@ -210,7 +229,7 @@ namespace Application.Services
             var employeeName = request.Employee.FirstName + " " + request.Employee.LastName;
             await _emailService.SendEmailAsync(
                 request.Employee.Email,
-                "Leave Rejected ❌",
+                "Leave Rejected",
                 $"Dear {employeeName},\n\n" +
                 $"Your {request.LeaveType.Name} request from {request.StartDate:dd-MMM-yyyy} to {request.EndDate:dd-MMM-yyyy} ({request.TotalDays} days) has been REJECTED.\n\n" +
                 $"Reason: {decisionNote ?? "No reason provided"}\n\n" +
@@ -254,25 +273,6 @@ namespace Application.Services
             await _leaveRepository.UpdateRequestAsync(request);
 
             return _mapper.Map<LeaveRequestResponseDto>(request);
-        }
-
-        public async Task<List<LeaveRequestResponseDto>> GetMyRequestsAsync(string employeeEmail)
-        {
-            var employee = await _employeeRepository.GetByEmailAsync(employeeEmail);
-            if (employee == null) throw new NotFoundException("Employee profile not found!");
-
-            var requests = await _leaveRepository.GetRequestsByEmployeeAsync(employee.Id);
-            if (requests.Count == 0) throw new NotFoundException("No leave requests found!");
-
-            return _mapper.Map<List<LeaveRequestResponseDto>>(requests);
-        }
-
-        public async Task<List<LeaveRequestResponseDto>> GetPendingRequestAsync()
-        {
-            var requests = await _leaveRepository.GetPendingRequestAsync();
-            if (requests.Count == 0) throw new NotFoundException("No pending leave requests found!");
-
-            return _mapper.Map<List<LeaveRequestResponseDto>>(requests);
         }
 
     }
