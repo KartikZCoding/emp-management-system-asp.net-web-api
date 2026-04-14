@@ -2,6 +2,7 @@ using Application.Common;
 using Application.DTOs.Auth;
 using Application.Interfaces;
 using Azure;
+using Domain.Exceptions;
 using EmpMS.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -67,7 +68,7 @@ namespace EmpMS.Controllers
                 Expires = DateTime.UtcNow.AddDays(7)
             });
 
-            _apiResponse.Data = new { response.Username, response.Email, response.Role, response.RefreshToken };
+            _apiResponse.Data = new { response.Username, response.Email, response.Role};
             _apiResponse.Status = true;
             _apiResponse.StatusCode = HttpStatusCode.OK;
             return Ok(_apiResponse);
@@ -113,9 +114,21 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> RefreshToken(RefreshTokenDto refreshTokenDto)
+        public async Task<ActionResult<APIResponse>> RefreshToken()
         {
-            var response = await _authService.RefreshTokenAsync(refreshTokenDto);
+            var accessToken = Request.Cookies["accessToken"];
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+                throw new UnauthorizedException("Missing tokens");
+
+            var dto = new RefreshTokenDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            };
+
+            var response = await _authService.RefreshTokenAsync(dto);
 
             Response.Cookies.Append("accessToken", response.Token, new CookieOptions
             {
@@ -133,7 +146,7 @@ namespace EmpMS.Controllers
                 Expires = DateTime.UtcNow.AddDays(7)
             });
 
-            _apiResponse.Data = new { response.Username, response.Email, response.Role, response.RefreshToken };
+            _apiResponse.Data = new { response.Username, response.Email, response.Role};
             _apiResponse.Status = true;
             _apiResponse.StatusCode = HttpStatusCode.OK;
             return Ok(_apiResponse);
