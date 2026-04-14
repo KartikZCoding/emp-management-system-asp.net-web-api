@@ -160,25 +160,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-/*Open Swagger in browser automatically when app starts*/
-app.Lifetime.ApplicationStarted.Register(() =>
-{
-    var urls = app.Urls.FirstOrDefault() ?? "http://localhost:5230";
-    var swaggerUrl = $"{urls}/swagger";
-    Log.Information("Opening Swagger UI at {SwaggerUrl}", swaggerUrl);
-    try
-    {
-        var psi = new System.Diagnostics.ProcessStartInfo
-        {
-            FileName = swaggerUrl,
-            UseShellExecute = true
-        };
-        System.Diagnostics.Process.Start(psi);
-    }
-    catch (Exception ex)
-    {
-        Log.Warning(ex, "Could not open browser automatically. Navigate to {SwaggerUrl}", swaggerUrl);
-    }
-});
-
 app.Run();

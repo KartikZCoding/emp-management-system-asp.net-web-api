@@ -72,7 +72,7 @@ namespace Application.Services
                     Email = dto.Email,
                     PasswordHash = passwordHash,
                     IsActive = true,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     EmployeeId = dto.EmployeeId,
                     MustChangePassword = true,
                     CreatedBy = createdBy

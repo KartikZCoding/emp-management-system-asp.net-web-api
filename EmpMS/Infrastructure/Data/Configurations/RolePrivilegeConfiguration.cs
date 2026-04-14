@@ -26,7 +26,7 @@ namespace Infrastructure.Data.Configurations
                 .HasForeignKey(u => u.PrivilegeId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Unique composite index (UserId + RoleId)
+            // Unique composite index (RoleId + PrivilegeId)
             builder.HasIndex(ur => new { ur.RoleId, ur.PrivilegeId })
                    .IsUnique();
         }   
