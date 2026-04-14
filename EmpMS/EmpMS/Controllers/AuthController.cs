@@ -1,7 +1,6 @@
 using Application.Common;
 using Application.DTOs.Auth;
 using Application.Interfaces;
-using Azure;
 using Domain.Exceptions;
 using EmpMS.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -16,12 +15,10 @@ namespace EmpMS.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private APIResponse _apiResponse;
 
         public AuthController(IAuthService authService)
         {
             _authService = authService;
-            _apiResponse = new();
         }
 
         [HasPermission("User.Create")]
@@ -30,17 +27,16 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> CreateUser(CreateUserDto createUserDto)
+        public async Task<ActionResult<APIResponse<CreateUserResponseDto>>> CreateUser(CreateUserDto createUserDto)
         {
             string createdBy = User.FindFirst(ClaimTypes.Name)?.Value ?? "System";
 
             var result = await _authService.CreateUserAsync(createUserDto, createdBy);
 
-            _apiResponse.Data = result;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.Created;
-
-            return StatusCode(StatusCodes.Status201Created, _apiResponse);
+            return StatusCode(StatusCodes.Status201Created, new APIResponse<CreateUserResponseDto>(result)
+            {
+                StatusCode = HttpStatusCode.Created
+            });
         }
 
         [AllowAnonymous]
@@ -48,7 +44,7 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> Login(LoginDto loginDto)
+        public async Task<ActionResult<APIResponse<object>>> Login(LoginDto loginDto)
         {
             var response = await _authService.LoginAsync(loginDto);
 
@@ -68,10 +64,7 @@ namespace EmpMS.Controllers
                 Expires = DateTime.UtcNow.AddDays(7)
             });
 
-            _apiResponse.Data = new { response.Username, response.Email, response.Role};
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            return Ok(new APIResponse<object>(new { response.Username, response.Email, response.Role }));
         }
 
 
@@ -84,11 +77,7 @@ namespace EmpMS.Controllers
         {
             await _authService.SendOtpAsync(forgotPasswordDto);
 
-            _apiResponse.Data = "Otp sent successfully!";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-
-            return Ok(_apiResponse);
+            return Ok(new APIResponse { Message = "OTP sent successfully" });
         }
 
         [AllowAnonymous]
@@ -100,11 +89,7 @@ namespace EmpMS.Controllers
         {
             await _authService.ResetPasswordAsync(resetPasswordDto);
 
-            _apiResponse.Data = "Password changed successfully!";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-
-            return Ok(_apiResponse);
+            return Ok(new APIResponse { Message = "Password changed successfully" });
         }
 
         [AllowAnonymous]
@@ -114,7 +99,7 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> RefreshToken()
+        public async Task<ActionResult<APIResponse<object>>> RefreshToken()
         {
             var accessToken = Request.Cookies["accessToken"];
             var refreshToken = Request.Cookies["refreshToken"];
@@ -146,11 +131,7 @@ namespace EmpMS.Controllers
                 Expires = DateTime.UtcNow.AddDays(7)
             });
 
-            _apiResponse.Data = new { response.Username, response.Email, response.Role};
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse<object>(new { response.Username, response.Email, response.Role }));
         }
 
 
@@ -167,11 +148,7 @@ namespace EmpMS.Controllers
 
             await _authService.ChangePasswordAsync(userId, changePasswordDto);
 
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            _apiResponse.Data = "Successfull";
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse { Message = "Password changed successfully" });
         }
 
         /*[Authorize]
@@ -187,11 +164,7 @@ namespace EmpMS.Controllers
 
             await _authService.UserResetPasswordAsync(userId, resetPassUserDto);
 
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            _apiResponse.Data = "Successfull";
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse { Message = "Password reset successfully" });
         }
 
         [Authorize(Roles = "Admin")]
@@ -206,11 +179,7 @@ namespace EmpMS.Controllers
 
             await _authService.AdminResetPasswordAsync(resetPassAdminDto);
 
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            _apiResponse.Data = "Successfull";
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse { Message = "Password reset successfully" });
         }
         */
 

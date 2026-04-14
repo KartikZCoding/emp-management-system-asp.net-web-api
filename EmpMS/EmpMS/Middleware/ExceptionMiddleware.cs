@@ -60,7 +60,7 @@ namespace EmpMS.Middleware
                 var apiResponse = new APIResponse();
                 apiResponse.Status = false;
                 apiResponse.StatusCode = statusCode;
-                apiResponse.Errors.Add(ex.Message);
+                apiResponse.Error = ex.Message;
 
                 var jsonResponse = JsonSerializer.Serialize(apiResponse);
 

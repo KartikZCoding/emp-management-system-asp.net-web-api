@@ -14,12 +14,10 @@ namespace EmpMS.Controllers
     public class RolesController : ControllerBase
     {
         private readonly IRoleService _roleService;
-        private APIResponse _apiResponse;
 
         public RolesController(IRoleService roleService)
         {
             _roleService = roleService;
-            _apiResponse = new();
         }
 
         [HttpGet]
@@ -28,16 +26,10 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> GetAllRoles()
+        public async Task<ActionResult<APIResponse<List<RoleResponseDto>>>> GetAllRoles()
         {
-
             var response = await _roleService.GetAllRolesAsync();
-
-            _apiResponse.Data = response;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse<List<RoleResponseDto>>(response));
         }
 
         [HttpPost]
@@ -48,14 +40,13 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> CreateRole(RoleDto roleDto)
         {
-
             await _roleService.CreateRoleAsync(roleDto);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.Created;
-            return StatusCode(StatusCodes.Status201Created, _apiResponse);
-
+            return StatusCode(StatusCodes.Status201Created, new APIResponse
+            {
+                StatusCode = HttpStatusCode.Created,
+                Message = "Role created successfully"
+            });
         }
 
         [HttpPut("{id}")]
@@ -66,14 +57,9 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> UpdateRole(int id, RoleDto roleDto)
         {
-
             await _roleService.UpdateRoleAsync(id, roleDto);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse { Message = "Role updated successfully" });
         }
 
         [HttpDelete("{id}")]
@@ -84,14 +70,9 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> DeleteRole(int id)
         {
-
             await _roleService.DeleteRoleAsync(id);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse { Message = "Role deleted successfully" });
         }
     }
 }

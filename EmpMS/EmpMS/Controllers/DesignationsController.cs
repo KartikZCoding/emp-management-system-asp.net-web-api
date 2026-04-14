@@ -14,12 +14,10 @@ namespace EmpMS.Controllers
     public class DesignationsController : ControllerBase
     {
         private readonly IDesignationService _designationService;
-        private APIResponse _apiResponse;
 
         public DesignationsController(IDesignationService designationService)
         {
             _designationService = designationService;
-            _apiResponse = new();
         }
 
         [HttpGet]
@@ -27,14 +25,10 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> GetAllDesignations()
+        public async Task<ActionResult<APIResponse<List<DesignationResponseDto>>>> GetAllDesignations()
         {
             var response = await _designationService.GetAllDesignationsAsync();
-
-            _apiResponse.Data = response;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            return Ok(new APIResponse<List<DesignationResponseDto>>(response));
         }
 
         [HttpGet("{id}")]
@@ -44,14 +38,10 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> GetDesignationById(int id)
+        public async Task<ActionResult<APIResponse<DesignationResponseDto>>> GetDesignationById(int id)
         {
             var response = await _designationService.GetDesignationByIdAsync(id);
-
-            _apiResponse.Data = response;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            return Ok(new APIResponse<DesignationResponseDto>(response));
         }
 
         [HttpPost]
@@ -65,10 +55,11 @@ namespace EmpMS.Controllers
         {
             await _designationService.CreateDesignationAsync(designationDto);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.Created;
-            return StatusCode(StatusCodes.Status201Created, _apiResponse);
+            return StatusCode(StatusCodes.Status201Created, new APIResponse
+            {
+                StatusCode = HttpStatusCode.Created,
+                Message = "Designation created successfully"
+            });
         }
 
         [HttpPut("{id}")]
@@ -83,10 +74,7 @@ namespace EmpMS.Controllers
         {
             await _designationService.UpdateDesignationAsync(id, designationDto);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            return Ok(new APIResponse { Message = "Designation updated successfully" });
         }
 
         [HttpDelete("{id}")]
@@ -101,10 +89,7 @@ namespace EmpMS.Controllers
         {
             await _designationService.DeleteDesignationAsync(id);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            return Ok(new APIResponse { Message = "Designation deleted successfully" });
         }
     }
 }

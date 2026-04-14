@@ -14,12 +14,10 @@ namespace EmpMS.Controllers
     public class PrivilegesController : ControllerBase
     {
         private readonly IPrivilegeService _privilegeService;
-        private APIResponse _apiResponse;
 
         public PrivilegesController(IPrivilegeService privilegeService)
         {
             _privilegeService = privilegeService;
-            _apiResponse = new();
         }
 
         [HttpGet]
@@ -28,16 +26,10 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> GetAllPrivileges()
+        public async Task<ActionResult<APIResponse<List<PrivilegeResponseDto>>>> GetAllPrivileges()
         {
-
             var response = await _privilegeService.GetAllPrivilegesAsync();
-
-            _apiResponse.Data = response;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse<List<PrivilegeResponseDto>>(response));
         }
 
         [HttpGet("{id}")]
@@ -46,16 +38,10 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> GetPrivilegeById(int id)
+        public async Task<ActionResult<APIResponse<PrivilegeResponseDto>>> GetPrivilegeById(int id)
         {
-
             var response = await _privilegeService.GetPrivilegeByIdAsync(id);
-
-            _apiResponse.Data = response;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse<PrivilegeResponseDto>(response));
         }
 
         [HttpPost]
@@ -66,14 +52,13 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> CreatePrivilege(PrivilegeDto privilegeDto)
         {
-
             await _privilegeService.CreatePrivilegeAsync(privilegeDto);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.Created;
-            return StatusCode(StatusCodes.Status201Created, _apiResponse);
-
+            return StatusCode(StatusCodes.Status201Created, new APIResponse
+            {
+                StatusCode = HttpStatusCode.Created,
+                Message = "Privilege created successfully"
+            });
         }
 
         [HttpPut("{id}")]
@@ -84,14 +69,9 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> UpdatePrivilege(int id, PrivilegeDto privilegeDto)
         {
-
             await _privilegeService.UpdatePrivilegeAsync(id, privilegeDto);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse { Message = "Privilege updated successfully" });
         }
 
         [HttpDelete("{id}")]
@@ -102,14 +82,9 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> DeletePrivilege(int id)
         {
-
             await _privilegeService.DeletePrivilegeAsync(id);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse { Message = "Privilege deleted successfully" });
         }
     }
 }

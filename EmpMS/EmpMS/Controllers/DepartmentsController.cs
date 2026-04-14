@@ -1,5 +1,6 @@
 using Application.Common;
 using Application.DTOs.Department;
+using Application.DTOs.Employee;
 using Application.Interfaces;
 using EmpMS.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -14,12 +15,10 @@ namespace EmpMS.Controllers
     public class DepartmentsController : ControllerBase
     {
         private readonly IDepartmentService _departmentService;
-        private APIResponse _apiResponse;
 
         public DepartmentsController(IDepartmentService departmentService)
         {
             _departmentService = departmentService;
-            _apiResponse = new();
         }
 
         [HttpGet]
@@ -27,14 +26,10 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> GetAllDepartments()
+        public async Task<ActionResult<APIResponse<List<DepartmentResponseDto>>>> GetAllDepartments()
         {
             var response = await _departmentService.GetAllDepartmentsAsync();
-
-            _apiResponse.Data = response;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            return Ok(new APIResponse<List<DepartmentResponseDto>>(response));
         }
 
         [HttpGet("{id}")]
@@ -44,14 +39,10 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> GetDepartmentById(int id)
+        public async Task<ActionResult<APIResponse<DepartmentResponseDto>>> GetDepartmentById(int id)
         {
             var response = await _departmentService.GetDepartmentByIdAsync(id);
-
-            _apiResponse.Data = response;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            return Ok(new APIResponse<DepartmentResponseDto>(response));
         }
 
         [HttpPost]
@@ -65,10 +56,11 @@ namespace EmpMS.Controllers
         {
             await _departmentService.CreateDepartmentAsync(departmentDto);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.Created;
-            return StatusCode(StatusCodes.Status201Created, _apiResponse);
+            return StatusCode(StatusCodes.Status201Created, new APIResponse
+            {
+                StatusCode = HttpStatusCode.Created,
+                Message = "Department created successfully"
+            });
         }
 
         [HttpPut("{id}")]
@@ -83,10 +75,7 @@ namespace EmpMS.Controllers
         {
             await _departmentService.UpdateDepartmentAsync(id, departmentDto);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            return Ok(new APIResponse { Message = "Department updated successfully" });
         }
 
         [HttpDelete("{id}")]
@@ -101,10 +90,7 @@ namespace EmpMS.Controllers
         {
             await _departmentService.DeleteDepartmentAsync(id);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            return Ok(new APIResponse { Message = "Department deleted successfully" });
         }
 
         [HttpGet("{id}/employees")]
@@ -115,14 +101,10 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> GetEmployeesInDepartment(int id)
+        public async Task<ActionResult<APIResponse<List<EmployeeListDto>>>> GetEmployeesInDepartment(int id)
         {
             var response = await _departmentService.GetEmployeesInDepartmentAsync(id);
-
-            _apiResponse.Data = response;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            return Ok(new APIResponse<List<EmployeeListDto>>(response));
         }
     }
 }

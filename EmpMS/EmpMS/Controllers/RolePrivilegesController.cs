@@ -14,12 +14,10 @@ namespace EmpMS.Controllers
     public class RolePrivilegesController : ControllerBase
     {
         private readonly IRolePrivilegeService _rolePrivilegeService;
-        private APIResponse _apiResponse;
 
         public RolePrivilegesController(IRolePrivilegeService rolePrivilegeService)
         {
             _rolePrivilegeService = rolePrivilegeService;
-            _apiResponse = new();
         }
 
         [HttpPost]
@@ -30,14 +28,13 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> AssignPrivilege(RolePrivilegeDto rolePrivilegeDto)
         {
-
             await _rolePrivilegeService.AssignPrivilegeToRoleAsync(rolePrivilegeDto);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.Created;
-            return StatusCode(StatusCodes.Status201Created, _apiResponse);
-
+            return StatusCode(StatusCodes.Status201Created, new APIResponse
+            {
+                StatusCode = HttpStatusCode.Created,
+                Message = "Privilege assigned successfully"
+            });
         }
 
         [HttpGet("role/{roleId}")]
@@ -46,16 +43,10 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> GetPrivilegeByRole(int roleId)
+        public async Task<ActionResult<APIResponse<List<PrivilegeResponseDto>>>> GetPrivilegeByRole(int roleId)
         {
-
             var privileges = await _rolePrivilegeService.GetPrivilegesByRoleIdAsync(roleId);
-
-            _apiResponse.Data = privileges;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse<List<PrivilegeResponseDto>>(privileges));
         }
 
         [HttpDelete("{roleId}/{privilegeId}")]
@@ -66,14 +57,9 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> RemovePrivilege(int roleId, int privilegeId)
         {
-
             await _rolePrivilegeService.RemovePrivilegeFromRoleAsync(roleId, privilegeId);
 
-            _apiResponse.Data = "Successfull";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
-
+            return Ok(new APIResponse { Message = "Privilege removed successfully" });
         }
     }
 }

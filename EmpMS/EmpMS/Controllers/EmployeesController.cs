@@ -3,8 +3,6 @@ using Application.DTOs.Employee;
 using Application.Interfaces;
 using EmpMS.Attributes;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Security.Claims;
@@ -17,45 +15,34 @@ namespace EmpMS.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
-        private APIResponse _apiResponse;
         private readonly ILogger<EmployeesController> _logger;
+
         public EmployeesController(IEmployeeService employeeService, ILogger<EmployeesController> logger)
         {
             _employeeService = employeeService;
-            _apiResponse = new();
             _logger = logger;
         }
 
         [HttpGet]
         [HasPermission("Employee.Read")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetAllEmployees(
+        public async Task<ActionResult<APIResponse<PaginatedResult<EmployeeListDto>>>> GetAllEmployees(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string? sortBy = null,
             [FromQuery] string? sortOrder = "asc")
         {
             var result = await _employeeService.GetAllEmployeesAsync(page, pageSize, sortBy, sortOrder);
-
-            _apiResponse.Data = result;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-
-            return Ok(_apiResponse);
+            return Ok(new APIResponse<PaginatedResult<EmployeeListDto>>(result));
         }
 
         [HttpGet("{id}")]
         [HasPermission("Employee.Read")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetEmployeeById(int id)
+        public async Task<ActionResult<APIResponse<EmployeeResponseDto>>> GetEmployeeById(int id)
         {
             var result = await _employeeService.GetEmployeeByIdAsync(id);
-
-            _apiResponse.Data = result;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-
-            return Ok(_apiResponse);
+            return Ok(new APIResponse<EmployeeResponseDto>(result));
         }
 
         [HttpPost]
@@ -65,11 +52,11 @@ namespace EmpMS.Controllers
         {
             await _employeeService.CreateEmployeeAsync(dto);
 
-            _apiResponse.Data = "Employee created successfully!";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.Created;
-
-            return StatusCode(StatusCodes.Status201Created, _apiResponse);
+            return StatusCode(StatusCodes.Status201Created, new APIResponse
+            {
+                StatusCode = HttpStatusCode.Created,
+                Message = "Employee created successfully"
+            });
         }
 
         [HttpPut("{id}")]
@@ -79,11 +66,7 @@ namespace EmpMS.Controllers
         {
             await _employeeService.UpdateEmployeeAsync(id, dto);
 
-            _apiResponse.Data = "Employee updated successfully!";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-
-            return Ok(_apiResponse);
+            return Ok(new APIResponse { Message = "Employee updated successfully" });
         }
 
         [HttpDelete("{id}")]
@@ -93,60 +76,43 @@ namespace EmpMS.Controllers
         {
             await _employeeService.SoftDeleteEmployeeAsync(id);
 
-            _apiResponse.Data = "Employee deleted successfully!";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-
-            return Ok(_apiResponse);
+            return Ok(new APIResponse { Message = "Employee deleted successfully" });
         }
 
         [HttpGet("search")]
         [HasPermission("Employee.Read")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> SearchEmployees(
+        public async Task<ActionResult<APIResponse<List<EmployeeListDto>>>> SearchEmployees(
             [FromQuery] string? name,
             [FromQuery] int? dept,
             [FromQuery] int? designation)
         {
             var result = await _employeeService.SearchEmployeesAsync(name, dept, designation);
-
-            _apiResponse.Data = result;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-
-            return Ok(_apiResponse);
+            return Ok(new APIResponse<List<EmployeeListDto>>(result));
         }
 
         [HttpGet("department/{deptId}")]
         [HasPermission("Employee.Read")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetByDepartment(int deptId)
+        public async Task<ActionResult<APIResponse<List<EmployeeListDto>>>> GetByDepartment(int deptId)
         {
             var result = await _employeeService.GetByDepartmentAsync(deptId);
-
-            _apiResponse.Data = result;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-
-            return Ok(_apiResponse);
+            return Ok(new APIResponse<List<EmployeeListDto>>(result));
         }
 
         [HttpGet("manager/{managerId}")]
         [HasPermission("Employee.Read")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetByManager(int managerId)
+        public async Task<ActionResult<APIResponse<List<EmployeeListDto>>>> GetByManager(int managerId)
         {
             var result = await _employeeService.GetByManagerAsync(managerId);
-            _apiResponse.Data = result;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            return Ok(new APIResponse<List<EmployeeListDto>>(result));
         }
 
         [HttpGet("me")]
         [Authorize]// any authenticated user
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetOwnProfile()
+        public async Task<ActionResult<APIResponse<EmployeeResponseDto>>> GetOwnProfile()
         {
             // get current user's email from JWT token claims
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
@@ -154,12 +120,7 @@ namespace EmpMS.Controllers
                 return Unauthorized();
 
             var result = await _employeeService.GetOwnProfileAsync(email);
-
-            _apiResponse.Data = result;
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-
-            return Ok(_apiResponse);
+            return Ok(new APIResponse<EmployeeResponseDto>(result));
         }
 
         [HttpPut("me")]
@@ -170,11 +131,10 @@ namespace EmpMS.Controllers
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrEmpty(email))
                 return Unauthorized();
+
             await _employeeService.UpdateOwnProfileAsync(email, dto);
-            _apiResponse.Data = "Profile updated successfully!";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+
+            return Ok(new APIResponse { Message = "Profile updated successfully" });
         }
 
         [HttpPost("{id}/photo")]
@@ -185,11 +145,7 @@ namespace EmpMS.Controllers
             //_logger.LogInformation("Controller : called service");
             await _employeeService.UploadPhotoAsync(id, file);
 
-            _apiResponse.Data = "Photo uploaded successfully!";
-            _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-
-            return Ok(_apiResponse);
+            return Ok(new APIResponse { Message = "Photo uploaded successfully" });
         }
 
         [HttpGet("{id}/photo")]
