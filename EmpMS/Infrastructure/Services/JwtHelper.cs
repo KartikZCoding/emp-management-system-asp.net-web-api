@@ -4,30 +4,33 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Security.Cryptography.Pkcs;
-using System.Text;
 
 namespace Infrastructure.Services
 {
     public class JwtHelper : IJwtHelper
     {
         private readonly IConfiguration _configuration;
+        private readonly SigningCredentials _signingCredentials;
+        private readonly RsaSecurityKey _publicKey;
 
         public JwtHelper(IConfiguration configuration)
         {
             _configuration = configuration;
+
+            // Load PRIVATE key once at startup. used for signing tokens
+            var privateRsa = RSA.Create();
+            privateRsa.ImportFromPem(File.ReadAllText(configuration["Jwt:PrivateKeyPath"]));
+            _signingCredentials = new SigningCredentials(
+                new RsaSecurityKey(privateRsa), SecurityAlgorithms.RsaSha256);
+
+            // Load PUBLIC key once at startup. used for validating expired tokens
+            var publicRsa = RSA.Create();
+            publicRsa.ImportFromPem(File.ReadAllText(configuration["Jwt:PublicKeyPath"]));
+            _publicKey = new RsaSecurityKey(publicRsa);
         }
 
         public string GenerateToken(int userId, string username, string email, List<string> permissions)
         {
-            var privateKey = File.ReadAllText(_configuration["Jwt:PrivateKeyPath"]);
-
-            var rsa = RSA.Create();
-            rsa.ImportFromPem(privateKey);
-            var key = new RsaSecurityKey(rsa);
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
-
             var claims = new List<Claim>
             {
                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
@@ -46,9 +49,8 @@ namespace Infrastructure.Services
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpiryMinutes"])),
-                signingCredentials: creds
+                signingCredentials: _signingCredentials
             );
-
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
@@ -63,10 +65,6 @@ namespace Infrastructure.Services
 
         public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
         {
-            var publicKeyText = File.ReadAllText(_configuration["Jwt:PublicKeyPath"]);
-            var rsa = RSA.Create();
-            rsa.ImportFromPem(publicKeyText);
-
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
@@ -75,7 +73,7 @@ namespace Infrastructure.Services
                 ValidateLifetime = false,   // KEY: we allow expired tokens here
                 ValidIssuer = _configuration["Jwt:Issuer"],
                 ValidAudience = _configuration["Jwt:Audience"],
-                IssuerSigningKey = new RsaSecurityKey(rsa),
+                IssuerSigningKey = _publicKey,
                 ClockSkew = TimeSpan.Zero
             };
 

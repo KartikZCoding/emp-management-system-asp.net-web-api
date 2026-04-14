@@ -37,7 +37,7 @@ namespace EmpMS.Infrastructure
             services.AddScoped<IEmailService, EmailService>();
 
             // Infrastructure Services
-            services.AddScoped<IJwtHelper, JwtHelper>();
+            services.AddSingleton<IJwtHelper, JwtHelper>();
 
             return services;
         }
