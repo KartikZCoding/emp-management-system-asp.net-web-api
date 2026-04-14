@@ -17,7 +17,6 @@ namespace EmpMS.Middleware
         {
             var method = context.Request.Method;
             var path = context.Request.Path;
-            var statusCode = context.Response.StatusCode;
 
             _logger.LogInformation("REQUEST  HTTP {method} {path} incoming", method, path);
 
@@ -25,6 +24,7 @@ namespace EmpMS.Middleware
             await _next(context);
             stopwatch.Stop();
 
+            var statusCode = context.Response.StatusCode;
             var elapsedTime = stopwatch.ElapsedMilliseconds;
 
             if (statusCode < 400)
