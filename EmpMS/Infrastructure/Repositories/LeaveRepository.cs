@@ -33,13 +33,13 @@ namespace Infrastructure.Repositories
         public async Task CreateLeaveTypeAsync(LeaveType leaveType)
         {
             await _appDbContext.LeaveTypes.AddAsync(leaveType);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task UpdateLeaveTypeAsync(LeaveType leaveType)
         {
             _appDbContext.LeaveTypes.Update(leaveType);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task<bool> LeaveTypeExistsAsync(string name)
@@ -67,13 +67,13 @@ namespace Infrastructure.Repositories
         public async Task CreateBalanceAsync(LeaveBalance leaveBalance)
         {
             await _appDbContext.LeaveBalances.AddAsync(leaveBalance);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task UpdateBalanceAsync(LeaveBalance leaveBalance)
         {
             _appDbContext.LeaveBalances.Update(leaveBalance);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task AssignBalancesForEmployeeAsync(int employeeId, int year)
@@ -93,7 +93,7 @@ namespace Infrastructure.Repositories
             }).ToList();
 
             await _appDbContext.LeaveBalances.AddRangeAsync(balances);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task<LeaveRequest?> GetRequestByIdAsync(int id)
@@ -125,13 +125,13 @@ namespace Infrastructure.Repositories
         public async Task CreateRequestAsync(LeaveRequest leaveRequest)
         {
             await _appDbContext.LeaveRequests.AddAsync(leaveRequest);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task UpdateRequestAsync(LeaveRequest leaveRequest)
         {
             _appDbContext.LeaveRequests.Update(leaveRequest);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task<bool> HasOverlappingRequestAsync(int employeeId, DateOnly start, DateOnly end)

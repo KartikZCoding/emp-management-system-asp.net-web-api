@@ -19,14 +19,16 @@ namespace Application.Services
         private readonly IMapper _mapper;
         private readonly ILogger<LeaveService> _logger;
         private readonly IEmailService _emailService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public LeaveService(ILeaveRepository leaveRepository, IEmployeeRepository employeeRepository, IMapper mapper, ILogger<LeaveService> logger, IEmailService emailService)
+        public LeaveService(ILeaveRepository leaveRepository, IEmployeeRepository employeeRepository, IMapper mapper, ILogger<LeaveService> logger, IEmailService emailService, IUnitOfWork unitOfWork)
         {
             _leaveRepository = leaveRepository;
             _employeeRepository = employeeRepository;
             _mapper = mapper;
             _logger = logger;
             _emailService = emailService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<LeaveTypeResponseDto>> GetAllLeaveTypesAsync()
@@ -61,6 +63,7 @@ namespace Application.Services
             };
 
             await _leaveRepository.CreateLeaveTypeAsync(leaveType);
+            await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<LeaveTypeResponseDto>(leaveType);
         }
@@ -74,6 +77,7 @@ namespace Application.Services
             existingLeave.UpdatedAt = DateTime.Now;
 
             await _leaveRepository.UpdateLeaveTypeAsync(existingLeave);
+            await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<LeaveTypeResponseDto>(existingLeave);
         }
 
@@ -86,6 +90,7 @@ namespace Application.Services
             existingLeave.UpdatedAt = DateTime.Now;
 
             await _leaveRepository.UpdateLeaveTypeAsync(existingLeave);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<List<LeaveBalanceResponseDto>> GetMyBalancesAsync(string employeeEmail, int year)
@@ -108,6 +113,7 @@ namespace Application.Services
             if (existingBalances.Count > 0) throw new BadRequestException($"Leave balances already assigned for year {year}!");
 
             await _leaveRepository.AssignBalancesForEmployeeAsync(employeeId, year);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<LeaveRequestResponseDto> ApplyLeaveAsync(string employeeEmail, LeaveRequestDto dto)
@@ -147,6 +153,7 @@ namespace Application.Services
             };
 
             await _leaveRepository.CreateRequestAsync(leaveRequest);
+            await _unitOfWork.SaveChangesAsync();
 
             var created = await _leaveRepository.GetRequestByIdAsync(leaveRequest.Id);
             return _mapper.Map<LeaveRequestResponseDto>(created);
@@ -196,6 +203,7 @@ namespace Application.Services
             balance.RemainingLeaves -= request.TotalDays;
 
             await _leaveRepository.UpdateBalanceAsync(balance);
+            await _unitOfWork.SaveChangesAsync();
 
             var employeeName = request.Employee.FirstName + " " + request.Employee.LastName;
             await _emailService.SendEmailAsync(
@@ -225,6 +233,7 @@ namespace Application.Services
             request.UpdatedAt = DateTime.Now;
 
             await _leaveRepository.UpdateRequestAsync(request);
+            await _unitOfWork.SaveChangesAsync();
 
             var employeeName = request.Employee.FirstName + " " + request.Employee.LastName;
             await _emailService.SendEmailAsync(
@@ -271,6 +280,7 @@ namespace Application.Services
             request.UpdatedAt = DateTime.Now;
 
             await _leaveRepository.UpdateRequestAsync(request);
+            await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<LeaveRequestResponseDto>(request);
         }

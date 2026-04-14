@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -63,19 +63,19 @@ namespace Infrastructure.Repositories
         public async Task CreateAsync(Employee employee)
         {
             await _appDbContext.Employees.AddAsync(employee);
-            await _appDbContext.SaveChangesAsync();
+
         }
         public async Task UpdateAsync(Employee employee)
         {
             _appDbContext.Employees.Update(employee);
-            await _appDbContext.SaveChangesAsync();
+
         }
         public async Task SoftDeleteAsync(Employee employee)
         {
             employee.IsActive = false;
             employee.UpdatedAt = DateTime.Now;
             _appDbContext.Employees.Update(employee);
-            await _appDbContext.SaveChangesAsync();
+
         }
         public async Task<List<Employee>> SearchAsync(string? name, int? deptId, int? designationId)
         {
@@ -128,7 +128,7 @@ namespace Infrastructure.Repositories
             {
                 employee.PhotoPath = photoPath;
                 employee.UpdatedAt = DateTime.Now;
-                await _appDbContext.SaveChangesAsync();
+    
             }
         }
     }

@@ -17,7 +17,7 @@ namespace Infrastructure.Repositories
         public async Task AddRolePrivilegeAsync(RolePrivilege rolePrivilege)
         {
             await _appDbContext.RolePrivileges.AddAsync(rolePrivilege);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task<List<Privilege>> GetPrivilegesByRoleIdAsync(int roleId)
@@ -44,7 +44,7 @@ namespace Infrastructure.Repositories
         public async Task DeleteRolePrivilegeAsync(RolePrivilege rolePrivilege)
         {
             _appDbContext.RolePrivileges.Remove(rolePrivilege);
-            await _appDbContext.SaveChangesAsync();
+
         }
     }
 }

@@ -70,23 +70,23 @@ namespace Infrastructure.Repositories
         public async Task CreateAsync(Attendance attendance)
         {
             await _appDbContext.Attendances.AddAsync(attendance);
-            await _appDbContext.SaveChangesAsync();
+
         }
         public async Task CreateLogAsync(AttendanceLog log)
         {
             await _appDbContext.AttendanceLogs.AddAsync(log);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task UpdateAsync(Attendance attendance)
         {
             _appDbContext.Attendances.Update(attendance);
-            await _appDbContext.SaveChangesAsync();
+
         }
         public async Task UpdateLogAsync(AttendanceLog log)
         {
             _appDbContext.AttendanceLogs.Update(log);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task<int> GetActiveEmployeeCountAsync()

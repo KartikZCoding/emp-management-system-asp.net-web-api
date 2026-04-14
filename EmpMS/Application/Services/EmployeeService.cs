@@ -1,4 +1,4 @@
-﻿using Application.Common;
+using Application.Common;
 using Application.DTOs.Employee;
 using Application.Interfaces;
 using AutoMapper;
@@ -20,13 +20,15 @@ namespace Application.Services
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _env;
         private readonly ILogger<EmployeeService> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public EmployeeService(IEmployeeRepository employeeRepository, IMapper mapper, IWebHostEnvironment env, ILogger<EmployeeService> logger)
+        public EmployeeService(IEmployeeRepository employeeRepository, IMapper mapper, IWebHostEnvironment env, ILogger<EmployeeService> logger, IUnitOfWork unitOfWork)
         {
             _employeeRepository = employeeRepository;
             _mapper = mapper;
             _env = env;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<PaginatedResult<EmployeeListDto>> GetAllEmployeesAsync(int page, int pageSize, string? sortBy, string? sortOrder)
@@ -73,6 +75,7 @@ namespace Application.Services
             employee.IsActive = true;
 
             await _employeeRepository.CreateAsync(employee);
+            await _unitOfWork.SaveChangesAsync();
         }
         public async Task UpdateEmployeeAsync(int id, UpdateEmployeeDto dto)
         {
@@ -90,7 +93,7 @@ namespace Application.Services
             employee.UpdatedAt = DateTime.Now;
 
             await _employeeRepository.UpdateAsync(employee);
-
+            await _unitOfWork.SaveChangesAsync();
         }
         public async Task SoftDeleteEmployeeAsync(int id)
         {
@@ -101,6 +104,7 @@ namespace Application.Services
                 throw new NotFoundException("Employee not found!");
 
             await _employeeRepository.SoftDeleteAsync(employee);
+            await _unitOfWork.SaveChangesAsync();
         }
         public async Task<List<EmployeeListDto>> SearchEmployeesAsync(string? name, int? deptId, int? designationId)
         {
@@ -135,6 +139,7 @@ namespace Application.Services
             employee.UpdatedAt = DateTime.Now;
 
             await _employeeRepository.UpdateAsync(employee);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task UploadPhotoAsync(int id, IFormFile file)
@@ -179,6 +184,7 @@ namespace Application.Services
 
             var relativePath = $"/uploads/photos/{fileName}";
             await _employeeRepository.UpdatePhotoPathAsync(id, relativePath);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<(byte[] fileBytes, string contentType)> GetPhotoAsync(int id)

@@ -20,6 +20,7 @@ namespace Application.Services
         private readonly IMapper _mapper;
         private readonly ILogger<AttendanceRegularizationService> _logger;
         private readonly IEmailService _emailService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public AttendanceRegularizationService(
             IAttendanceRegularizationRepository attendanceRegularizationRepository,
@@ -27,7 +28,8 @@ namespace Application.Services
             IEmployeeRepository employeeRepository,
             IMapper mapper,
             ILogger<AttendanceRegularizationService> logger,
-            IEmailService emailService)
+            IEmailService emailService,
+            IUnitOfWork unitOfWork)
         {
             _attendanceRegularizationRepository = attendanceRegularizationRepository;
             _attendanceRepository = attendanceRepository;
@@ -35,6 +37,7 @@ namespace Application.Services
             _mapper = mapper;
             _logger = logger;
             _emailService = emailService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<AttendanceRegularizationResponseDto> CreateRequestAsync(string employeeEmail, AttendanceRegularizationRequestDto dto)
@@ -76,6 +79,7 @@ namespace Application.Services
             };
 
             await _attendanceRegularizationRepository.CreateAsync(regularization);
+            await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<AttendanceRegularizationResponseDto>(regularization);
         }
 
@@ -149,6 +153,7 @@ namespace Application.Services
                 $"HR Note: {decisionNote ?? "N/A"}\n\n" +
                 $"Regards,\nEmpMS HR Team"
             );
+            await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<AttendanceRegularizationResponseDto>(request);
         }
@@ -179,6 +184,7 @@ namespace Application.Services
                 $"If you have questions, please contact HR.\n\n" +
                 $"Regards,\nEmpMS HR Team"
             );
+            await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<AttendanceRegularizationResponseDto>(request);
         }

@@ -10,10 +10,12 @@ namespace Application.Services
     public class PrivilegeService : IPrivilegeService
     {
         private readonly IPrivilegeRepository _privilegeRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public PrivilegeService(IPrivilegeRepository privilegeRepository)
+        public PrivilegeService(IPrivilegeRepository privilegeRepository, IUnitOfWork unitOfWork)
         {
             _privilegeRepository = privilegeRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<PrivilegeResponseDto>> GetAllPrivilegesAsync()
@@ -52,6 +54,7 @@ namespace Application.Services
             };
 
             await _privilegeRepository.CreatePrivilegeAsync(privilege);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task UpdatePrivilegeAsync(int id, PrivilegeDto dto)
@@ -66,6 +69,7 @@ namespace Application.Services
             privilege.Description = dto.Description;
 
             await _privilegeRepository.UpdatePrivilegeAsync(privilege);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeletePrivilegeAsync(int id)
@@ -74,6 +78,7 @@ namespace Application.Services
             if (privilege == null) throw new NotFoundException("Privilege not found");
 
             await _privilegeRepository.DeletePrivilegeAsync(privilege);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

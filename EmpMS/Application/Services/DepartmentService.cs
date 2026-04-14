@@ -12,11 +12,13 @@ namespace Application.Services
     {
         private readonly IDepartmentRepository _departmentRepository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DepartmentService(IDepartmentRepository departmentRepository, IMapper mapper)
+        public DepartmentService(IDepartmentRepository departmentRepository, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _departmentRepository = departmentRepository;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<DepartmentResponseDto>> GetAllDepartmentsAsync()
@@ -49,6 +51,7 @@ namespace Application.Services
             department.CreatedAt = DateTime.Now;
 
             await _departmentRepository.CreateAsync(department);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task UpdateDepartmentAsync(int id, DepartmentDto departmentDto)
@@ -67,6 +70,7 @@ namespace Application.Services
             department.UpdatedAt = DateTime.Now;
 
             await _departmentRepository.UpdateAsync(department);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeleteDepartmentAsync(int id)
@@ -83,6 +87,7 @@ namespace Application.Services
             department.UpdatedAt = DateTime.Now;
 
             await _departmentRepository.DeleteAsync(department);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<List<EmployeeListDto>> GetEmployeesInDepartmentAsync(int departmentId)

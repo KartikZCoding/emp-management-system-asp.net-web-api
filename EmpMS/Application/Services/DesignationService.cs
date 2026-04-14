@@ -11,11 +11,13 @@ namespace Application.Services
     {
         private readonly IDesignationRepository _designationRepository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DesignationService(IDesignationRepository designationRepository, IMapper mapper)
+        public DesignationService(IDesignationRepository designationRepository, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _designationRepository = designationRepository;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<DesignationResponseDto>> GetAllDesignationsAsync()
@@ -48,6 +50,7 @@ namespace Application.Services
             designation.CreatedAt = DateTime.Now;
 
             await _designationRepository.CreateAsync(designation);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task UpdateDesignationAsync(int id, DesignationDto designationDto)
@@ -66,6 +69,7 @@ namespace Application.Services
             designation.UpdatedAt = DateTime.Now;
 
             await _designationRepository.UpdateAsync(designation);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeleteDesignationAsync(int id)
@@ -82,6 +86,7 @@ namespace Application.Services
             designation.UpdatedAt = DateTime.Now;
 
             await _designationRepository.DeleteAsync(designation);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

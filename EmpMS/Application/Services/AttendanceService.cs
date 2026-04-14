@@ -17,13 +17,15 @@ namespace Application.Services
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<AttendanceService> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AttendanceService(IAttendanceRepository attendanceRepository, IEmployeeRepository employeeRepository, IMapper mapper, ILogger<AttendanceService> logger)
+        public AttendanceService(IAttendanceRepository attendanceRepository, IEmployeeRepository employeeRepository, IMapper mapper, ILogger<AttendanceService> logger, IUnitOfWork unitOfWork)
         {
             _attendanceRepository = attendanceRepository;
             _employeeRepository = employeeRepository;
             _mapper = mapper;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
 
@@ -56,6 +58,7 @@ namespace Application.Services
 
                 await _attendanceRepository.CreateLogAsync(newLog);
                 await _attendanceRepository.UpdateAsync(attendance);
+                await _unitOfWork.SaveChangesAsync();
 
                 return _mapper.Map<AttendanceResponseDto>(attendance);
             }
@@ -82,6 +85,7 @@ namespace Application.Services
             };
 
             await _attendanceRepository.CreateLogAsync(firstLog);
+            await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<AttendanceResponseDto>(newAttendance);
 
@@ -112,6 +116,7 @@ namespace Application.Services
             attendance.UpdatedAt = DateTime.Now;
 
             await _attendanceRepository.UpdateAsync(attendance);
+            await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<AttendanceResponseDto>(attendance);
         }
@@ -245,6 +250,7 @@ namespace Application.Services
             attendance.UpdatedAt = DateTime.Now;
 
             await _attendanceRepository.UpdateAsync(attendance);
+            await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<AttendanceResponseDto>(attendance);
         }

@@ -32,19 +32,19 @@ namespace Infrastructure.Repositories
         public async Task CreateAsync(Designation designation)
         {
             await _appDbContext.Designations.AddAsync(designation);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task UpdateAsync(Designation designation)
         {
             _appDbContext.Designations.Update(designation);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task DeleteAsync(Designation designation)
         {
             _appDbContext.Designations.Update(designation);
-            await _appDbContext.SaveChangesAsync();
+
         }
     }
 }

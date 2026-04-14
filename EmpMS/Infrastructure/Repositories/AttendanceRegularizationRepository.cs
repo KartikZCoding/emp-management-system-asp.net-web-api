@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -43,13 +43,13 @@ namespace Infrastructure.Repositories
         public async Task CreateAsync(AttendanceRegularization request)
         {
             await _appDbContext.AttendanceRegularizations.AddAsync(request);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task UpdateAsync(AttendanceRegularization request)
         {
             _appDbContext.AttendanceRegularizations.Update(request);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task<bool> HasPendingRequestAsync(int attendanceId)

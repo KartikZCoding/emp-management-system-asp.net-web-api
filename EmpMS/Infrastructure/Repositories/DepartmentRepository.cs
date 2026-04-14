@@ -32,19 +32,19 @@ namespace Infrastructure.Repositories
         public async Task CreateAsync(Department department)
         {
             await _appDbContext.Departments.AddAsync(department);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task UpdateAsync(Department department)
         {
             _appDbContext.Departments.Update(department);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task DeleteAsync(Department department)
         {
             _appDbContext.Departments.Update(department);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task<List<Employee>> GetEmployeesByDepartmentIdAsync(int departmentId)

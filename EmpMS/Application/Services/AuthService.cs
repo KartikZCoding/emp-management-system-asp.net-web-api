@@ -78,7 +78,7 @@ namespace Application.Services
                     CreatedBy = createdBy
                 };
                 await _authRepository.CreateUserAsync(user);
-                await _unitOfWork.SaveChanges();
+                await _unitOfWork.SaveChangesAsync();
 
                 // 6. Assign roles
                 foreach (var roleId in dto.RoleIds)
@@ -90,7 +90,7 @@ namespace Application.Services
                     });
                 }
 
-                await _unitOfWork.SaveChanges();
+                await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.Commit();
 
                 // 7. Send welcome email with temp password

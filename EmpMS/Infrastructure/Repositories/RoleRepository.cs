@@ -22,7 +22,7 @@ namespace Infrastructure.Repositories
         public async Task CreateRoleAsync(Role role)
         {
             await _appDbContext.Roles.AddAsync(role);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task<List<Role>> GetAllRolesAsync()
@@ -41,13 +41,13 @@ namespace Infrastructure.Repositories
         public async Task UpdateRoleAsync(Role role)
         {
             _appDbContext.Roles.Update(role);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task DeleteRoleAsync(Role role)
         {
             _appDbContext.Roles.Remove(role);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
     }

@@ -12,15 +12,18 @@ namespace Application.Services
         private readonly IRolePrivilegeRepository _repository;
         private readonly IRoleRepository _roleRepository;
         private readonly IPrivilegeRepository _privilegeRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public RolePrivilegeService(
             IRolePrivilegeRepository repository,
             IRoleRepository roleRepository,
-            IPrivilegeRepository privilegeRepository)
+            IPrivilegeRepository privilegeRepository,
+            IUnitOfWork unitOfWork)
         {
             _repository = repository;
             _roleRepository = roleRepository;
             _privilegeRepository = privilegeRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task AssignPrivilegeToRoleAsync(RolePrivilegeDto dto)
@@ -44,6 +47,7 @@ namespace Application.Services
             };
 
             await _repository.AddRolePrivilegeAsync(rolePrivilege);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<List<PrivilegeResponseDto>> GetPrivilegesByRoleIdAsync(int roleId)
@@ -70,6 +74,7 @@ namespace Application.Services
             if (rolePrivilege == null) throw new NotFoundException("Role-Privilege link not found");
 
             await _repository.DeleteRolePrivilegeAsync(rolePrivilege);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

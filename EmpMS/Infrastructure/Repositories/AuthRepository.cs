@@ -65,7 +65,7 @@ namespace Infrastructure.Repositories
         public async Task UpdateUserAsync(User user)
         {
             _appDbContext.Users.Update(user);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
 

@@ -17,7 +17,7 @@ namespace Infrastructure.Repositories
         public async Task CreatePrivilegeAsync(Privilege privilege)
         {
             await _appDbContext.Privileges.AddAsync(privilege);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task<List<Privilege>> GetAllPrivilegesAsync()
@@ -38,13 +38,13 @@ namespace Infrastructure.Repositories
         public async Task UpdatePrivilegeAsync(Privilege privilege)
         {
             _appDbContext.Privileges.Update(privilege);
-            await _appDbContext.SaveChangesAsync();
+
         }
 
         public async Task DeletePrivilegeAsync(Privilege privilege)
         {
             _appDbContext.Privileges.Remove(privilege);
-            await _appDbContext.SaveChangesAsync();
+
         }
     }
 }
