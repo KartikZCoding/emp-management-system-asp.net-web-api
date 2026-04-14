@@ -16,8 +16,9 @@ namespace Application.Services
         private readonly IJwtHelper _jwtHelper;
         private readonly IMemoryCache _cache;
         private readonly IEmailService _emailService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuthService(IAuthRepository authRepository, IRoleRepository roleRepository, IEmployeeRepository employeeRepository, IJwtHelper jwtHelper, IMemoryCache cache, IEmailService emailService)
+        public AuthService(IAuthRepository authRepository, IRoleRepository roleRepository, IEmployeeRepository employeeRepository, IJwtHelper jwtHelper, IMemoryCache cache, IEmailService emailService, IUnitOfWork unitOfWork)
         {
             _authRepository = authRepository;
             _roleRepository = roleRepository;
@@ -25,16 +26,20 @@ namespace Application.Services
             _jwtHelper = jwtHelper;
             _cache = cache;
             _emailService = emailService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<CreateUserResponseDto> CreateUserAsync(CreateUserDto dto, string createdBy)
         {
+
             // 1. Validate username uniqueness
             if (await _authRepository.UserExistAsync(dto.Username))
                 throw new BadRequestException("Username already exists!");
             // 2. Validate email uniqueness
             if (await _authRepository.EmailExistsAsync(dto.Email))
                 throw new BadRequestException("Email already exists!");
+            if (dto.RoleIds == null || !dto.RoleIds.Any())
+                throw new BadRequestException("At least one role is required");
             // 3. If EmployeeId given, validate it
             if (dto.EmployeeId.HasValue)
             {
@@ -44,56 +49,75 @@ namespace Application.Services
                 if (await _authRepository.EmployeeHasUserAsync(dto.EmployeeId.Value))
                     throw new BadRequestException("This employee already has a user account!");
             }
-
-            // 4. Generate temporary password
-            string tempPassword = GenerateTemporaryPassword();
-            string passwordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
-            // 5. Create user
-            var user = new User
-            {
-                Username = dto.Username,
-                Email = dto.Email,
-                PasswordHash = passwordHash,
-                IsActive = true,
-                CreatedAt = DateTime.Now,
-                EmployeeId = dto.EmployeeId,
-                MustChangePassword = true,
-                CreatedBy = createdBy
-            };
-
-            // 6. Assign roles
+            // Checking roles exists or not!
             var roleNames = new List<string>();
             foreach (var roleId in dto.RoleIds)
             {
                 var role = await _roleRepository.GetRoleByIdAsync(roleId);
                 if (role == null) throw new NotFoundException($"Role with ID {roleId} not found!");
-                await _authRepository.CreateUserAsync(user);
-                await _authRepository.AddUserRoleAsync(new UserRole
-                {
-                    UserId = user.Id,
-                    RoleId = roleId
-                });
                 roleNames.Add(role.RoleName);
             }
 
-            // 7. Send welcome email with temp password
-            string subject = "Your EmpMS Account Has Been Created";
-            string body = $"Hello,\n\n"
-                + $"Your account has been created in the Employee Management System.\n\n"
-                + $"Username: {dto.Username}\n"
-                + $"Temporary Password: {tempPassword}\n\n"
-                + $"Please login and change your password immediately.\n\n"
-                + $"Regards,\nAdmin Team";
-            await _emailService.SendEmailAsync(dto.Email, subject, body);
-            // 8. Return response
-            return new CreateUserResponseDto
+            try
             {
-                UserId = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                Roles = roleNames,
-                EmployeeId = user.EmployeeId
-            };
+                await _unitOfWork.Begin();
+
+                // 4. Generate temporary password
+                string tempPassword = GenerateTemporaryPassword();
+                string passwordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
+                // 5. Create user
+                var user = new User
+                {
+                    Username = dto.Username,
+                    Email = dto.Email,
+                    PasswordHash = passwordHash,
+                    IsActive = true,
+                    CreatedAt = DateTime.Now,
+                    EmployeeId = dto.EmployeeId,
+                    MustChangePassword = true,
+                    CreatedBy = createdBy
+                };
+                await _authRepository.CreateUserAsync(user);
+                await _unitOfWork.SaveChanges();
+
+                // 6. Assign roles
+                foreach (var roleId in dto.RoleIds)
+                {
+                    await _authRepository.AddUserRoleAsync(new UserRole
+                    {
+                        UserId = user.Id,
+                        RoleId = roleId
+                    });
+                }
+
+                await _unitOfWork.SaveChanges();
+                await _unitOfWork.Commit();
+
+                // 7. Send welcome email with temp password
+                string subject = "Your EmpMS Account Has Been Created";
+                string body = $"Hello,\n\n"
+                    + $"Your account has been created in the Employee Management System.\n\n"
+                    + $"Username: {dto.Username}\n"
+                    + $"Temporary Password: {tempPassword}\n\n"
+                    + $"Please login and change your password immediately.\n\n"
+                    + $"Regards,\nAdmin Team";
+                await _emailService.SendEmailAsync(dto.Email, subject, body);
+                // 8. Return response
+                return new CreateUserResponseDto
+                {
+                    UserId = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    Roles = roleNames,
+                    EmployeeId = user.EmployeeId
+                };
+
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.Rollback();
+                throw;
+            }
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginDto dto)

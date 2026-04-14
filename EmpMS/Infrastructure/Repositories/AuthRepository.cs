@@ -30,12 +30,10 @@ namespace Infrastructure.Repositories
         public async Task CreateUserAsync(User user)
         {
             await _appDbContext.Users.AddAsync(user);
-            await _appDbContext.SaveChangesAsync();
         }
         public async Task AddUserRoleAsync(UserRole userRole)
         {
             await _appDbContext.UserRoles.AddAsync(userRole);
-            await _appDbContext.SaveChangesAsync();
 
         }
 
