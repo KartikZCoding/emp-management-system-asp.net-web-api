@@ -22,8 +22,8 @@ namespace EmpMS.Controllers
             _apiResponse = new();
         }
 
-        [HttpPost("assign-privilege")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -35,8 +35,8 @@ namespace EmpMS.Controllers
 
             _apiResponse.Data = "Successfull";
             _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            _apiResponse.StatusCode = HttpStatusCode.Created;
+            return StatusCode(StatusCodes.Status201Created, _apiResponse);
 
         }
 

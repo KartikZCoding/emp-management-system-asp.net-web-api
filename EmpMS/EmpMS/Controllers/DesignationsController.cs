@@ -56,7 +56,7 @@ namespace EmpMS.Controllers
 
         [HttpPost]
         [HasPermission("Designation.Create")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -67,8 +67,8 @@ namespace EmpMS.Controllers
 
             _apiResponse.Data = "Successfull";
             _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
-            return Ok(_apiResponse);
+            _apiResponse.StatusCode = HttpStatusCode.Created;
+            return StatusCode(StatusCodes.Status201Created, _apiResponse);
         }
 
         [HttpPut("{id}")]

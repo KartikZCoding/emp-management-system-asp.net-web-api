@@ -1,4 +1,4 @@
-﻿using Application.Common;
+using Application.Common;
 using Application.DTOs.Employee;
 using Application.Interfaces;
 using EmpMS.Attributes;
@@ -60,16 +60,16 @@ namespace EmpMS.Controllers
 
         [HttpPost]
         [HasPermission("Employee.Create")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<APIResponse>> CreateEmployee(CreateEmployeeDto dto)
         {
             await _employeeService.CreateEmployeeAsync(dto);
 
             _apiResponse.Data = "Employee created successfully!";
             _apiResponse.Status = true;
-            _apiResponse.StatusCode = HttpStatusCode.OK;
+            _apiResponse.StatusCode = HttpStatusCode.Created;
 
-            return Ok(_apiResponse);
+            return StatusCode(StatusCodes.Status201Created, _apiResponse);
         }
 
         [HttpPut("{id}")]
