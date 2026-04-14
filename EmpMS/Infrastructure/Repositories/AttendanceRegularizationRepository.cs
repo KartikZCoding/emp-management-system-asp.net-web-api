@@ -22,6 +22,7 @@ namespace Infrastructure.Repositories
             return await _appDbContext.AttendanceRegularizations
                 .Include(e => e.Employee)
                 .Include(e => e.Attendance.AttendanceLogs)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
 
@@ -30,14 +31,16 @@ namespace Infrastructure.Repositories
             return await _appDbContext.AttendanceRegularizations
                 .Include(e => e.Employee)
                 .Include(e => e.Attendance.AttendanceLogs)
-                .Where(e => e.EmployeeId == employeeId).OrderByDescending(e => e.CreatedAt).ToListAsync();
+                .Where(e => e.EmployeeId == employeeId).OrderByDescending(e => e.CreatedAt)
+                .AsNoTracking().ToListAsync();
         }
 
         public async Task<List<AttendanceRegularization>> GetPendingAsync()
         {
             return await _appDbContext.AttendanceRegularizations
                 .Include(e => e.Employee)
-                .Where(e => e.Status == "Pending").ToListAsync();
+                .Where(e => e.Status == "Pending")
+                .AsNoTracking().ToListAsync();
         }
 
         public async Task CreateAsync(AttendanceRegularization request)

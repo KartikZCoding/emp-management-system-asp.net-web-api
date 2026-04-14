@@ -21,12 +21,14 @@ namespace Infrastructure.Repositories
         {
             return await _appDbContext.LeaveTypes
                 .Where(lt => lt.IsActive)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
         public async Task<LeaveType?> GetLeaveTypeByIdAsync(int id)
         {
             return await _appDbContext.LeaveTypes
+                .AsNoTracking()
                 .FirstOrDefaultAsync(lt => lt.Id == id);
         }
 
@@ -53,12 +55,14 @@ namespace Infrastructure.Repositories
             return await _appDbContext.LeaveBalances
                 .Include(lb => lb.LeaveType)
                 .Where(lb => lb.EmployeeId == employeeId && lb.Year == year)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
         public async Task<LeaveBalance?> GetBalanceAsync(int employeeId, int leaveTypeId, int year)
         {
             return await _appDbContext.LeaveBalances
+                .AsNoTracking()
                 .FirstOrDefaultAsync(lb => lb.EmployeeId == employeeId
                     && lb.LeaveTypeId == leaveTypeId
                     && lb.Year == year);
@@ -80,6 +84,7 @@ namespace Infrastructure.Repositories
         {
             var leaveTypes = await _appDbContext.LeaveTypes
                 .Where(lt => lt.IsActive)
+                .AsNoTracking()
                 .ToListAsync();
 
             var balances = leaveTypes.Select(lt => new LeaveBalance
@@ -101,6 +106,7 @@ namespace Infrastructure.Repositories
             return await _appDbContext.LeaveRequests
                 .Include(lr => lr.Employee)
                 .Include(lr => lr.LeaveType)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(lr => lr.Id == id);
         }
 
@@ -110,6 +116,7 @@ namespace Infrastructure.Repositories
                 .Include(lr => lr.LeaveType)
                 .Where(lr => lr.EmployeeId == employeeId)
                 .OrderByDescending(lr => lr.CreatedAt)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -119,6 +126,7 @@ namespace Infrastructure.Repositories
                 .Include(lr => lr.Employee)
                 .Include(lr => lr.LeaveType)
                 .Where(lr => lr.Status == "Pending")
+                .AsNoTracking()
                 .ToListAsync();
         }
 

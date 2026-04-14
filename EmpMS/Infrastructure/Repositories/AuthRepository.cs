@@ -39,18 +39,23 @@ namespace Infrastructure.Repositories
 
         public async Task<User?> GetUserByIdAsync(int id)
         {
-            return await _appDbContext.Users.Where(u => u.Id ==  id).FirstOrDefaultAsync();
+            return await _appDbContext.Users
+                .AsNoTracking()
+                .Where(u => u.Id ==  id).FirstOrDefaultAsync();
         }
         public async Task<User?> GetUserByUsernameAsync(string username)
         {
             return await _appDbContext.Users
                 .Include(u => u.UserRoles)
                 .ThenInclude(u => u.Role)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Username == username);
         }
         public async Task<User?> GetUserByEmailAsync(string email)
         {
-            return await _appDbContext.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
+            return await _appDbContext.Users
+                .AsNoTracking()
+                .Where(u => u.Email == email).FirstOrDefaultAsync();
         }
         public async Task<List<string>> GetUserPermissionsAsync(int userId)
         {
@@ -59,6 +64,7 @@ namespace Infrastructure.Repositories
                 .SelectMany(ur => ur.Role.RolePrivileges)
                 .Select(rp => rp.Privilege.PrivilegeName)
                 .Distinct()
+                .AsNoTracking()
                 .ToListAsync();
         }
 

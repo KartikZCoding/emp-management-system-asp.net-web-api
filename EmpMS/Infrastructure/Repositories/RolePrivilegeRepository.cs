@@ -26,12 +26,14 @@ namespace Infrastructure.Repositories
                 .Include(rp => rp.Privilege)
                 .Where(rp => rp.RoleId == roleId)
                 .Select(rp => rp.Privilege)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
         public async Task<RolePrivilege> GetRolePrivilegeAsync(int roleId, int privilegeId)
         {
             return await _appDbContext.RolePrivileges
+                .AsNoTracking()
                 .FirstOrDefaultAsync(rp => rp.RoleId == roleId && rp.PrivilegeId == privilegeId);
         }
 

@@ -45,6 +45,7 @@ namespace Infrastructure.Repositories
             return await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .AsNoTracking()
                 .ToListAsync();
         }
         public async Task<int> GetTotalCountAsync()
@@ -58,6 +59,7 @@ namespace Infrastructure.Repositories
                 .Include(e => e.Designation)
                 .Include(e => e.Manager)
                 .Where(e => e.Id == id && e.IsActive)
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
         public async Task CreateAsync(Employee employee)
@@ -92,7 +94,7 @@ namespace Infrastructure.Repositories
             if (designationId.HasValue)
                 query = query.Where(e => e.DesignationId == designationId.Value);
 
-            return await query.ToListAsync();
+            return await query.AsNoTracking().ToListAsync();
         }
         public async Task<List<Employee>> GetByDepartmentAsync(int departmentId)
         {
@@ -100,6 +102,7 @@ namespace Infrastructure.Repositories
                 .Include(e => e.Department)
                 .Include(e => e.Designation)
                 .Where(e => e.DepartmentId == departmentId && e.IsActive)
+                .AsNoTracking()
                 .ToListAsync();
         }
         public async Task<List<Employee>> GetByManagerAsync(int managerId)
@@ -108,6 +111,7 @@ namespace Infrastructure.Repositories
                 .Include(e => e.Department)
                 .Include(e => e.Designation)
                 .Where(e => e.ManagerId == managerId && e.IsActive)
+                .AsNoTracking()
                 .ToListAsync();
         }
         public async Task<bool> EmailExistAsync(string email)
@@ -118,6 +122,7 @@ namespace Infrastructure.Repositories
         {
             return await _appDbContext.Employees
                 .Include(e => e.Department).Include(e => e.Designation).Include(e => e.Manager)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Email == email && e.IsActive);
         }
 

@@ -16,12 +16,12 @@ namespace Infrastructure.Repositories
 
         public async Task<List<Designation>> GetAllAsync()
         {
-            return await _appDbContext.Designations.Where(d => d.IsActive).ToListAsync();
+            return await _appDbContext.Designations.AsNoTracking().Where(d => d.IsActive).ToListAsync();
         }
 
         public async Task<Designation?> GetByIdAsync(int id)
         {
-            return await _appDbContext.Designations.FirstOrDefaultAsync(d => d.Id == id && d.IsActive);
+            return await _appDbContext.Designations.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id && d.IsActive);
         }
 
         public async Task<bool> ExistsAsync(string designationName)

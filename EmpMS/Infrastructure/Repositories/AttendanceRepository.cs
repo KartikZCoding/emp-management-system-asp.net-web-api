@@ -23,6 +23,7 @@ namespace Infrastructure.Repositories
             return await _appDbContext.Attendances
                 .Include(a => a.AttendanceLogs)
                 .Include(a => a.Employee)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(a => a.EmployeeId == empId && a.Date == date);
         }
         public async Task<Attendance?> GetByIdAsync(int id)
@@ -30,6 +31,7 @@ namespace Infrastructure.Repositories
             return await _appDbContext.Attendances
                 .Include(a => a.AttendanceLogs)
                 .Include(a => a.Employee)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 
@@ -40,6 +42,7 @@ namespace Infrastructure.Repositories
                 .Include(a => a.Employee)
                 .Where(a => a.EmployeeId == empId && a.Date.Month == month && a.Date.Year == year)
                 .OrderByDescending(a => a.Date)
+                .AsNoTracking()
                 .ToListAsync();
         }
         public async Task<List<Attendance>> GetByDepartmentAndDateAsync(int deptId, DateOnly date)
@@ -48,6 +51,7 @@ namespace Infrastructure.Repositories
                 .Include(a => a.AttendanceLogs)
                 .Include(a => a.Employee)
                 .Where(a => a.Employee.DepartmentId == deptId && a.Date == date)
+                .AsNoTracking()
                 .ToListAsync();
         }
         public async Task<List<Attendance>> GetTodayAsync(DateOnly today)
@@ -56,6 +60,7 @@ namespace Infrastructure.Repositories
                 .Include(a => a.AttendanceLogs)
                 .Include(a => a.Employee)
                 .Where(a => a.Date == today)
+                .AsNoTracking()
                 .ToListAsync();
         }
         public async Task<List<Attendance>> GetMonthlyAllAsync(int month, int year)
@@ -64,6 +69,7 @@ namespace Infrastructure.Repositories
                 .Include(a => a.AttendanceLogs)
                 .Include(a => a.Employee)
                 .Where(a => a.Date.Month == month && a.Date.Year == year)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -105,6 +111,7 @@ namespace Infrastructure.Repositories
                        && a.Date < today   // exclude today — employee is still working!
                        && a.AttendanceLogs.Any(l => l.CheckOut == null))
                 .OrderByDescending(a => a.Date)
+                .AsNoTracking()
                 .ToListAsync();
         }
     }

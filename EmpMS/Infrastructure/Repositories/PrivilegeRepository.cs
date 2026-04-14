@@ -22,12 +22,12 @@ namespace Infrastructure.Repositories
 
         public async Task<List<Privilege>> GetAllPrivilegesAsync()
         {
-            return await _appDbContext.Privileges.ToListAsync();
+            return await _appDbContext.Privileges.AsNoTracking().ToListAsync();
         }
 
         public async Task<Privilege> GetPrivilegeByIdAsync(int id)
         {
-            return await _appDbContext.Privileges.FindAsync(id);
+            return await _appDbContext.Privileges.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<bool> PrivilegeExistsAsync(string name)

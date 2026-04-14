@@ -16,12 +16,12 @@ namespace Infrastructure.Repositories
 
         public async Task<List<Department>> GetAllAsync()
         {
-            return await _appDbContext.Departments.Where(d => d.IsActive).ToListAsync();
+            return await _appDbContext.Departments.AsNoTracking().Where(d => d.IsActive).ToListAsync();
         }
 
         public async Task<Department?> GetByIdAsync(int id)
         {
-            return await _appDbContext.Departments.FirstOrDefaultAsync(d => d.Id == id && d.IsActive);
+            return await _appDbContext.Departments.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id && d.IsActive);
         }
 
         public async Task<bool> ExistsAsync(string departmentName)
@@ -53,6 +53,7 @@ namespace Infrastructure.Repositories
                 .Where(e => e.DepartmentId == departmentId && e.IsActive)
                 .Include(e => e.Department)
                 .Include(e => e.Designation)
+                .AsNoTracking()
                 .ToListAsync();
         }
     }

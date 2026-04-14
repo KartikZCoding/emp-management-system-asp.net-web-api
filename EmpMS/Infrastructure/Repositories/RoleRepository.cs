@@ -27,15 +27,15 @@ namespace Infrastructure.Repositories
 
         public async Task<List<Role>> GetAllRolesAsync()
         {
-            return await _appDbContext.Roles.ToListAsync();
+            return await _appDbContext.Roles.AsNoTracking().ToListAsync();
         }
         public async Task<Role?> GetRoleByIdAsync(int id)
         {
-            return await _appDbContext.Roles.Where(r => r.Id == id).FirstOrDefaultAsync();
+            return await _appDbContext.Roles.AsNoTracking().Where(r => r.Id == id).FirstOrDefaultAsync();
         }
         public async Task<Role?> GetRoleByNameAsync(string roleName)
         {
-            return await _appDbContext.Roles.Where(r => r.RoleName == roleName).FirstOrDefaultAsync();
+            return await _appDbContext.Roles.AsNoTracking().Where(r => r.RoleName == roleName).FirstOrDefaultAsync();
         }
 
         public async Task UpdateRoleAsync(Role role)
