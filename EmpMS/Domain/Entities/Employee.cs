@@ -31,5 +31,7 @@ namespace Domain.Entities
         public Employee? Manager { get; set; } //each employee may have one manager
         public ICollection<Employee> Subordinates { get; set; } //a manager can have many subordinates
         public ICollection<Attendance> Attendances { get; set; }
+        public ICollection<LeaveRequest> LeaveRequests { get; set; }
+        public ICollection<Salary> Salaries { get; set; }
     }
 }
