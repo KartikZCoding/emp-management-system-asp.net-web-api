@@ -4,7 +4,7 @@ using Application.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EmpMS.Infrastructure
+namespace Application
 {
     public static class DependencyInjection
     {

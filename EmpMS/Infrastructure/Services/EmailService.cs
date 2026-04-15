@@ -1,9 +1,9 @@
-﻿using Application.Interfaces;
+﻿using Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
 
-namespace Application.Services
+namespace Infrastructure.Services
 {
     public class EmailService : IEmailService
     {

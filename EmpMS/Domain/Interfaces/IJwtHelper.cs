@@ -1,8 +1,6 @@
-
-
 using System.Security.Claims;
 
-namespace Application.Interfaces
+namespace Domain.Interfaces
 {
     public interface IJwtHelper
     {

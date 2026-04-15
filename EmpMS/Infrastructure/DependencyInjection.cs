@@ -1,5 +1,3 @@
-using Application.Interfaces;
-using Application.Services;
 using Domain.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
@@ -8,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EmpMS.Infrastructure
+namespace Infrastructure
 {
     public static class DependencyInjection
     {
