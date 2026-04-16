@@ -30,6 +30,8 @@ namespace Infrastructure
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
             services.AddScoped<IAttendanceRegularizationRepository, AttendanceRegularizationRepository>();
             services.AddScoped<ILeaveRepository, LeaveRepository>();
+            services.AddScoped<ISalaryRepository, SalaryRepository>();
+            services.AddScoped<ISalaryStructureRepository, SalaryStructureRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddScoped<IEmailService, EmailService>();
