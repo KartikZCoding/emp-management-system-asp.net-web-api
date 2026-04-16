@@ -29,6 +29,10 @@ namespace Infrastructure.Data
         public DbSet<LeaveBalance> LeaveBalances { get; set; }
         public DbSet<LeaveRequest> LeaveRequests { get; set; }
 
+        public DbSet<Salary> Salaries { get; set; }
+        public DbSet<SalaryStructure> SalaryStructures { get; set; }
+
+
         //Configurations
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,6 +50,9 @@ namespace Infrastructure.Data
             modelBuilder.ApplyConfiguration(new LeaveTypeConfiguration());
             modelBuilder.ApplyConfiguration(new LeaveBalanceConfiguration());
             modelBuilder.ApplyConfiguration(new LeaveRequestConfiguration());
+
+            modelBuilder.ApplyConfiguration(new SalaryConfiguration());
+            modelBuilder.ApplyConfiguration(new SalaryStructureConfiguration());
         }
     }
 }
