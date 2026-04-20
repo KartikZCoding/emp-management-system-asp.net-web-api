@@ -33,5 +33,7 @@ namespace Domain.Entities
         public ICollection<Attendance> Attendances { get; set; }
         public ICollection<LeaveRequest> LeaveRequests { get; set; }
         public ICollection<Salary> Salaries { get; set; }
+        public ICollection<PerformanceReview> PerformanceReviews { get; set; }   // reviews received
+        public ICollection<PerformanceReview> ReviewsGiven { get; set; }         // reviews written as reviewer
     }
 }
