@@ -33,6 +33,7 @@ namespace Infrastructure
             services.AddScoped<ISalaryRepository, SalaryRepository>();
             services.AddScoped<ISalaryStructureRepository, SalaryStructureRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IPerformanceReviewRepository, PerformanceReviewRepository>();
 
             services.AddScoped<IEmailService, EmailService>();
 

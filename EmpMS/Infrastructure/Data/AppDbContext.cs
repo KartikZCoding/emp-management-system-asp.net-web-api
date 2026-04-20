@@ -32,6 +32,8 @@ namespace Infrastructure.Data
         public DbSet<Salary> Salaries { get; set; }
         public DbSet<SalaryStructure> SalaryStructures { get; set; }
 
+        public DbSet<PerformanceReview> PerformanceReviews { get; set; }
+
 
         //Configurations
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -53,6 +55,8 @@ namespace Infrastructure.Data
 
             modelBuilder.ApplyConfiguration(new SalaryConfiguration());
             modelBuilder.ApplyConfiguration(new SalaryStructureConfiguration());
+
+            modelBuilder.ApplyConfiguration(new PerformanceReviewConfiguration());
         }
     }
 }
