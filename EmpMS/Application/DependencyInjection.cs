@@ -23,6 +23,7 @@ namespace Application
             services.AddScoped<IAttendanceService, AttendanceService>();
             services.AddScoped<IAttendanceRegularizationService, AttendanceRegularizationService>();
             services.AddScoped<ILeaveService, LeaveService>();
+            services.AddScoped<ISalaryService, SalaryService>();
 
             /* register automapper 13+ syntax */
             services.AddAutoMapper(cfg => { }, typeof(AutoMapperProfile));

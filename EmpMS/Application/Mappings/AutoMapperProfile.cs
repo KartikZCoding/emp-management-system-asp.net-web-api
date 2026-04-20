@@ -4,6 +4,7 @@ using Application.DTOs.Department;
 using Application.DTOs.Designation;
 using Application.DTOs.Employee;
 using Application.DTOs.Leave;
+using Application.DTOs.Salary;
 using AutoMapper;
 using Domain.Entities;
 
@@ -65,6 +66,17 @@ namespace Application.Mappings
             CreateMap<LeaveRequest, LeaveRequestResponseDto>()
                 .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.FirstName + " " + src.Employee.LastName))
                 .ForMember(dest => dest.LeaveTypeName, opt => opt.MapFrom(src => src.LeaveType.Name));
+
+            // Salary mappings
+            CreateMap<Salary, SalaryResponseDto>()
+                .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(
+                    src => src.Employee.FirstName + " " + src.Employee.LastName))
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(
+                    src => src.Employee.Department.DepartmentName))
+                .ForMember(dest => dest.DesignationName, opt => opt.MapFrom(
+                    src => src.Employee.Designation.DesignationName))
+                .ForMember(dest => dest.MonthName, opt => opt.MapFrom(
+                    src => new DateTime(src.Year, src.Month, 1).ToString("MMMM yyyy")));
 
         }
     }
