@@ -24,6 +24,6 @@ namespace Application.DTOs.Employee
         public int DesignationId { get; set; }
         public int? ManagerId { get; set; }
         [Required]
-        public decimal Salary { get; set; }
+        public decimal AnnualCTC { get; set; }
     }
 }

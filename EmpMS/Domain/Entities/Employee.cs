@@ -15,7 +15,7 @@ namespace Domain.Entities
         public int DepartmentId { get; set; } //FK -> Departments
         public int DesignationId { get; set; } //FK -> Designations
         public int? ManagerId { get; set; } //FK -> self (nullable, not everyone has a manager)
-        public decimal Salary { get; set; }
+        public decimal AnnualCTC { get; set; }
         public string? PhotoPath { get; set; } //nullable — photo may not be uploaded yet
         public bool IsActive { get; set; }
 

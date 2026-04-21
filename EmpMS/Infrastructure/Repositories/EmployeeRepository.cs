@@ -31,8 +31,8 @@ namespace Infrastructure.Repositories
                             ? query.OrderByDescending(e => e.FirstName)
                             : query.OrderBy(e => e.FirstName),
                 "salary" => sortOrder == "desc"
-                            ? query.OrderByDescending(e => e.Salary)
-                            : query.OrderBy(e => e.Salary),
+                            ? query.OrderByDescending(e => e.AnnualCTC)
+                            : query.OrderBy(e => e.AnnualCTC),
                 "joindate" => sortOrder == "desc"
                             ? query.OrderByDescending(e => e.JoinDate)
                             : query.OrderBy(e => e.JoinDate),

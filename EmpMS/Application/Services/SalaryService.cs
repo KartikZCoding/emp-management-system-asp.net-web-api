@@ -208,7 +208,7 @@ namespace Application.Services
             Employee employee, int month, int year,
             List<SalaryStructure> structure, string generatedBy)
         {
-            decimal annualCTC = employee.Salary;        // Employee.Salary = Annual CTC
+            decimal annualCTC = employee.AnnualCTC;        // Employee.AnnualCTC = Annual CTC
             decimal monthlyCTC = Math.Round(annualCTC / 12, 2);
 
             // Calculate earning components

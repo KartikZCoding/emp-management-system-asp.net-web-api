@@ -27,7 +27,7 @@ namespace Infrastructure.Data.Configurations
             builder.Property(e => e.UpdatedBy).HasMaxLength(100);
 
             //salary precision
-            builder.Property(e => e.Salary).HasColumnType("decimal(18,2)");
+            builder.Property(e => e.AnnualCTC).HasColumnType("decimal(18,2)");
 
             //default values
             builder.Property(e => e.IsActive).HasDefaultValue(true);

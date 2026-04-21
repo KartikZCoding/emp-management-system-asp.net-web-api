@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -23,7 +23,7 @@ namespace Application.DTOs.Employee
         public string DesignationName { get; set; }
         public int? ManagerId { get; set; }
         public string? ManagerName { get; set; }
-        public decimal Salary { get; set; }
+        public decimal AnnualCTC { get; set; }
         public string? PhotoPath { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; } 
