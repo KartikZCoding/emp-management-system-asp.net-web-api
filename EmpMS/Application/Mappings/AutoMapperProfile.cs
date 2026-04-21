@@ -6,6 +6,7 @@ using Application.DTOs.Employee;
 using Application.DTOs.Leave;
 using Application.DTOs.Salary;
 using Application.DTOs.Review;
+using Application.DTOs.Notification;
 using AutoMapper;
 using Domain.Entities;
 
@@ -90,6 +91,9 @@ namespace Application.Mappings
                 .ForMember(dest => dest.ReviewerName, opt => opt.MapFrom(
                     src => src.Reviewer.FirstName + " " + src.Reviewer.LastName))
                 .ForMember(dest => dest.RatingLabel, opt => opt.Ignore()); // Set manually in service
+
+            // Notification mappings
+            CreateMap<Notification, NotificationResponseDto>();
 
         }
     }

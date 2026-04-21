@@ -25,6 +25,9 @@ namespace Application
             services.AddScoped<ILeaveService, LeaveService>();
             services.AddScoped<ISalaryService, SalaryService>();
             services.AddScoped<IPerformanceReviewService, PerformanceReviewService>();
+            services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<IReportService, ReportService>();
 
             /* register automapper 13+ syntax */
             services.AddAutoMapper(cfg => { }, typeof(AutoMapperProfile));
