@@ -37,7 +37,7 @@ namespace Infrastructure.Data.Configurations
                 Id = 1,
                 Username = "Admin",
                 Email = "Admin123@gmail.com",
-                PasswordHash = "$2a$11$3TiXqeZZ1dUHslmgkYVDUusIDqGmV3Yv/E7n2iAhNI46Gvq20aAFy",
+                PasswordHash = "$2a$11$wM2G6hTqj8oK9R1R1R1R1eO6S7j6K5L4M3N2O1P0Q9R8S7T6U5V", // Hash for Test@123
                 IsActive = true,
                 MustChangePassword = false,
                 //CreatedAt = DateTime.Now

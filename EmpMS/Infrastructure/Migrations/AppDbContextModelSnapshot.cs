@@ -627,6 +627,224 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Privileges", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "View employee records",
+                            PrivilegeName = "Employee.Read"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Create new employees",
+                            PrivilegeName = "Employee.Create"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Update employee details",
+                            PrivilegeName = "Employee.Update"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Delete employees",
+                            PrivilegeName = "Employee.Delete"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "View departments",
+                            PrivilegeName = "Department.Read"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Description = "Create departments",
+                            PrivilegeName = "Department.Create"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Description = "Update departments",
+                            PrivilegeName = "Department.Update"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Description = "Delete departments",
+                            PrivilegeName = "Department.Delete"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Description = "View designations",
+                            PrivilegeName = "Designation.Read"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Description = "Create designations",
+                            PrivilegeName = "Designation.Create"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Description = "Update designations",
+                            PrivilegeName = "Designation.Update"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Description = "Delete designations",
+                            PrivilegeName = "Designation.Delete"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Description = "Manage roles",
+                            PrivilegeName = "Role.Manage"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Description = "Manage privileges",
+                            PrivilegeName = "Privilege.Manage"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Description = "Assign roles to users",
+                            PrivilegeName = "User.AssignRole"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Description = "Create new users",
+                            PrivilegeName = "User.Create"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Description = "Read attendaces of employees",
+                            PrivilegeName = "Attendance.Read"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Description = "Read report of attendaces",
+                            PrivilegeName = "Attendance.ReadReport"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Description = "Update a attendace of employee",
+                            PrivilegeName = "Attendance.Update"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Description = "Leave types getting and reading",
+                            PrivilegeName = "Leave.Read"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Description = "Creating a leaves",
+                            PrivilegeName = "Leave.Create"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Description = "Updating a existing leaves",
+                            PrivilegeName = "Leave.Update"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Description = "Delete a leaves",
+                            PrivilegeName = "Leave.Delete"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Description = "Updating a leave for Approve, Reject, Cancel",
+                            PrivilegeName = "LeaveRequest.Update"
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Description = "Generate a Employees salaries",
+                            PrivilegeName = "Salary.Create"
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Description = "Reading a employees salaries",
+                            PrivilegeName = "Salary.Read"
+                        },
+                        new
+                        {
+                            Id = 27,
+                            Description = "Updating a employee salary",
+                            PrivilegeName = "Salary.Update"
+                        },
+                        new
+                        {
+                            Id = 28,
+                            Description = "Create performance reviews for employees",
+                            PrivilegeName = "Review.Create"
+                        },
+                        new
+                        {
+                            Id = 29,
+                            Description = "View performance reviews and department summaries",
+                            PrivilegeName = "Review.Read"
+                        },
+                        new
+                        {
+                            Id = 30,
+                            Description = "Update existing performance reviews",
+                            PrivilegeName = "Review.Update"
+                        },
+                        new
+                        {
+                            Id = 31,
+                            Description = "Delete performance reviews",
+                            PrivilegeName = "Review.Delete"
+                        },
+                        new
+                        {
+                            Id = 32,
+                            Description = "Send broadcast notifications to all employees",
+                            PrivilegeName = "Notification.Broadcast"
+                        },
+                        new
+                        {
+                            Id = 33,
+                            Description = "View the graphical analytics dashboard.",
+                            PrivilegeName = "Dashboard.View"
+                        },
+                        new
+                        {
+                            Id = 34,
+                            Description = "Download the full CSV directory of employees.",
+                            PrivilegeName = "Report.Employees"
+                        },
+                        new
+                        {
+                            Id = 35,
+                            Description = "Download monthly attendance CSV reports.",
+                            PrivilegeName = "Report.Attendance"
+                        },
+                        new
+                        {
+                            Id = 36,
+                            Description = "Download monthly salary CSV reports.",
+                            PrivilegeName = "Report.Salary"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Role", b =>
@@ -653,6 +871,32 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Full system access",
+                            RoleName = "Admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Human Resources management",
+                            RoleName = "HR"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Team and project management",
+                            RoleName = "Manager"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Standard staff access",
+                            RoleName = "Employee"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.RolePrivilege", b =>
@@ -677,6 +921,434 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("RolePrivileges", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 11,
+                            PrivilegeId = 1,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 9,
+                            PrivilegeId = 2,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 12,
+                            PrivilegeId = 3,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 10,
+                            PrivilegeId = 4,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            PrivilegeId = 5,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 1,
+                            PrivilegeId = 6,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            PrivilegeId = 7,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            PrivilegeId = 8,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 7,
+                            PrivilegeId = 9,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 5,
+                            PrivilegeId = 10,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 8,
+                            PrivilegeId = 11,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 6,
+                            PrivilegeId = 12,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 14,
+                            PrivilegeId = 13,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 13,
+                            PrivilegeId = 14,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 15,
+                            PrivilegeId = 15,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 31,
+                            PrivilegeId = 16,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 33,
+                            PrivilegeId = 17,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 34,
+                            PrivilegeId = 18,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 35,
+                            PrivilegeId = 19,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 40,
+                            PrivilegeId = 20,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 41,
+                            PrivilegeId = 21,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 42,
+                            PrivilegeId = 22,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 43,
+                            PrivilegeId = 23,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 44,
+                            PrivilegeId = 24,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 51,
+                            PrivilegeId = 25,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 52,
+                            PrivilegeId = 26,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 53,
+                            PrivilegeId = 27,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 56,
+                            PrivilegeId = 28,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 57,
+                            PrivilegeId = 29,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 58,
+                            PrivilegeId = 30,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 59,
+                            PrivilegeId = 31,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 66,
+                            PrivilegeId = 32,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 68,
+                            PrivilegeId = 33,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 69,
+                            PrivilegeId = 34,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 70,
+                            PrivilegeId = 35,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 71,
+                            PrivilegeId = 36,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 26,
+                            PrivilegeId = 1,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 25,
+                            PrivilegeId = 2,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 27,
+                            PrivilegeId = 3,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 20,
+                            PrivilegeId = 5,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 19,
+                            PrivilegeId = 6,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 21,
+                            PrivilegeId = 7,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 23,
+                            PrivilegeId = 9,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 22,
+                            PrivilegeId = 10,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 24,
+                            PrivilegeId = 11,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 32,
+                            PrivilegeId = 16,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 38,
+                            PrivilegeId = 17,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 37,
+                            PrivilegeId = 18,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 36,
+                            PrivilegeId = 19,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 46,
+                            PrivilegeId = 20,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 47,
+                            PrivilegeId = 21,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 48,
+                            PrivilegeId = 22,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 49,
+                            PrivilegeId = 24,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 54,
+                            PrivilegeId = 25,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 55,
+                            PrivilegeId = 26,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 60,
+                            PrivilegeId = 28,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 61,
+                            PrivilegeId = 29,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 62,
+                            PrivilegeId = 30,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 67,
+                            PrivilegeId = 32,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 72,
+                            PrivilegeId = 33,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 73,
+                            PrivilegeId = 34,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 74,
+                            PrivilegeId = 35,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 75,
+                            PrivilegeId = 36,
+                            RoleId = 2
+                        },
+                        new
+                        {
+                            Id = 30,
+                            PrivilegeId = 1,
+                            RoleId = 3
+                        },
+                        new
+                        {
+                            Id = 28,
+                            PrivilegeId = 5,
+                            RoleId = 3
+                        },
+                        new
+                        {
+                            Id = 29,
+                            PrivilegeId = 9,
+                            RoleId = 3
+                        },
+                        new
+                        {
+                            Id = 39,
+                            PrivilegeId = 17,
+                            RoleId = 3
+                        },
+                        new
+                        {
+                            Id = 50,
+                            PrivilegeId = 24,
+                            RoleId = 3
+                        },
+                        new
+                        {
+                            Id = 63,
+                            PrivilegeId = 28,
+                            RoleId = 3
+                        },
+                        new
+                        {
+                            Id = 64,
+                            PrivilegeId = 29,
+                            RoleId = 3
+                        },
+                        new
+                        {
+                            Id = 65,
+                            PrivilegeId = 30,
+                            RoleId = 3
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Salary", b =>
@@ -852,131 +1524,6 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("SalaryStructures", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CalculationType = "PercentageOfCTC",
-                            ComponentName = "Basic Salary",
-                            ComponentType = "Earning",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = "System",
-                            DisplayOrder = 1,
-                            IsActive = true,
-                            Value = 40m
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CalculationType = "PercentageOfBasic",
-                            ComponentName = "HRA",
-                            ComponentType = "Earning",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = "System",
-                            DisplayOrder = 2,
-                            IsActive = true,
-                            Value = 50m
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CalculationType = "PercentageOfBasic",
-                            ComponentName = "Dearness Allowance",
-                            ComponentType = "Earning",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = "System",
-                            DisplayOrder = 3,
-                            IsActive = true,
-                            Value = 10m
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CalculationType = "Fixed",
-                            ComponentName = "Travel Allowance",
-                            ComponentType = "Earning",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = "System",
-                            DisplayOrder = 4,
-                            IsActive = true,
-                            Value = 1600m
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CalculationType = "Remaining",
-                            ComponentName = "Special Allowance",
-                            ComponentType = "Earning",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = "System",
-                            DisplayOrder = 5,
-                            IsActive = true,
-                            Value = 0m
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CalculationType = "PercentageOfBasic",
-                            ComponentName = "Employee PF",
-                            ComponentType = "Deduction",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = "System",
-                            DisplayOrder = 1,
-                            IsActive = true,
-                            MaxLimit = 1800m,
-                            Value = 12m
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CalculationType = "Fixed",
-                            ComponentName = "Professional Tax",
-                            ComponentType = "Deduction",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = "System",
-                            DisplayOrder = 2,
-                            IsActive = true,
-                            MaxLimit = 2500m,
-                            Value = 200m
-                        },
-                        new
-                        {
-                            Id = 8,
-                            CalculationType = "TaxSlab",
-                            ComponentName = "Income Tax",
-                            ComponentType = "Deduction",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = "System",
-                            DisplayOrder = 3,
-                            IsActive = true,
-                            Value = 0m
-                        },
-                        new
-                        {
-                            Id = 9,
-                            CalculationType = "PercentageOfBasic",
-                            ComponentName = "Employer PF",
-                            ComponentType = "EmployerContribution",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = "System",
-                            DisplayOrder = 1,
-                            IsActive = true,
-                            MaxLimit = 1800m,
-                            Value = 12m
-                        },
-                        new
-                        {
-                            Id = 10,
-                            CalculationType = "PercentageOfBasic",
-                            ComponentName = "Gratuity",
-                            ComponentType = "EmployerContribution",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = "System",
-                            DisplayOrder = 2,
-                            IsActive = true,
-                            Value = 4.81m
-                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -1052,7 +1599,7 @@ namespace Infrastructure.Migrations
                             Email = "Admin123@gmail.com",
                             IsActive = true,
                             MustChangePassword = false,
-                            PasswordHash = "$2a$11$3TiXqeZZ1dUHslmgkYVDUusIDqGmV3Yv/E7n2iAhNI46Gvq20aAFy",
+                            PasswordHash = "$2a$11$wM2G6hTqj8oK9R1R1R1R1eO6S7j6K5L4M3N2O1P0Q9R8S7T6U5V",
                             Username = "Admin"
                         });
                 });

@@ -141,6 +141,7 @@ namespace Application.Services
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             await _authRepository.UpdateUserAsync(user);
+            await _unitOfWork.SaveChangesAsync();
 
             var loginResponse = new LoginResponseDto
             {
