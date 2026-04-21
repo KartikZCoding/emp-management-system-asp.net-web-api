@@ -35,5 +35,6 @@ namespace Domain.Entities
         public ICollection<Salary> Salaries { get; set; }
         public ICollection<PerformanceReview> PerformanceReviews { get; set; }   // reviews received
         public ICollection<PerformanceReview> ReviewsGiven { get; set; }         // reviews written as reviewer
+        public ICollection<Notification> Notifications { get; set; }
     }
 }
