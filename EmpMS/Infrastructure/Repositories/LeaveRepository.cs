@@ -101,6 +101,15 @@ namespace Infrastructure.Repositories
 
         }
 
+        public async Task<List<LeaveRequest>> GetAllRequestsAsync()
+        {
+            return await _appDbContext.LeaveRequests
+                .Include(lr => lr.Employee)
+                .Include(lr => lr.LeaveType)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<LeaveRequest?> GetRequestByIdAsync(int id)
         {
             return await _appDbContext.LeaveRequests
