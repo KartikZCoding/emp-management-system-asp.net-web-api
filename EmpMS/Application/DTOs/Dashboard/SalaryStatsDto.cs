@@ -17,5 +17,7 @@ namespace Application.DTOs.Dashboard
         public string DepartmentName { get; set; }
         public decimal TotalSalary { get; set; }
         public decimal AvgSalary { get; set; }
+        public decimal TotalExpenditure { get; set; }
+        public decimal AverageSalary { get; set; }
     }
 }

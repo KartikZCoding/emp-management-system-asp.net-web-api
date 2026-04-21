@@ -18,5 +18,7 @@ namespace Application.DTOs.Dashboard
     {
         public string DepartmentName { get; set; }
         public double PresentPercent { get; set; }
+        public int PresentCount { get; set; }
+        public int AbsentCount { get; set; }
     }
 }

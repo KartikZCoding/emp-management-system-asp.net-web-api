@@ -10,13 +10,16 @@ namespace Application.Services
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly ISalaryRepository _salaryRepository;
+        private readonly IAttendanceRepository _attendanceRepository;
 
         public ReportService(
             IEmployeeRepository employeeRepository,
-            ISalaryRepository salaryRepository)
+            ISalaryRepository salaryRepository,
+            IAttendanceRepository attendanceRepository)
         {
             _employeeRepository = employeeRepository;
             _salaryRepository = salaryRepository;
+            _attendanceRepository = attendanceRepository;
         }
 
         public async Task<byte[]> GenerateEmployeesReportCsvAsync()
@@ -37,10 +40,38 @@ namespace Application.Services
 
         public async Task<byte[]> GenerateAttendanceReportCsvAsync(int month, int year)
         {
+            var employees = await _employeeRepository.GetAllAsync(1, int.MaxValue, null, null);
+            var attendance = await _attendanceRepository.GetMonthlyAllAsync(month, year);
+            
+            // Calculate working days (Mon-Fri)
+            int workingDays = 0;
+            int daysInMonth = DateTime.DaysInMonth(year, month);
+            for (int day = 1; day <= daysInMonth; day++)
+            {
+                var d = new DateTime(year, month, day);
+                if (d.DayOfWeek != DayOfWeek.Saturday && d.DayOfWeek != DayOfWeek.Sunday)
+                    workingDays++;
+            }
+
             var sb = new StringBuilder();
-            sb.AppendLine("EmployeeId,Month,Year,PresentDays,AbsentDays");
-            // Placeholder logic for real attendance queries
-            return await Task.FromResult(Encoding.UTF8.GetBytes(sb.ToString()));
+            sb.AppendLine("EmployeeId,EmployeeName,Department,WorkingDays,PresentDays,AbsentDays,HalfDays,Leaves");
+
+            foreach (var emp in employees)
+            {
+                var empAtt = attendance.Where(a => a.EmployeeId == emp.Id).ToList();
+                int presentCount = empAtt.Count(a => a.Status == "Present");
+                int halfDayCount = empAtt.Count(a => a.Status == "HalfDay");
+                int leaveCount = empAtt.Count(a => a.Status == "OnLeave");
+                
+                // Effective present days considering half days
+                decimal effectivePresent = presentCount + (halfDayCount * 0.5m);
+                int absentCount = workingDays - (int)Math.Ceiling(effectivePresent) - leaveCount;
+                if (absentCount < 0) absentCount = 0;
+
+                sb.AppendLine($"{emp.Id},{emp.FirstName} {emp.LastName},{emp.Department?.DepartmentName},{workingDays},{presentCount},{absentCount},{halfDayCount},{leaveCount}");
+            }
+
+            return Encoding.UTF8.GetBytes(sb.ToString());
         }
 
         public async Task<byte[]> GenerateSalaryReportCsvAsync(int month, int year)

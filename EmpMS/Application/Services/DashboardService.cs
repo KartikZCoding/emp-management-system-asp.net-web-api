@@ -61,22 +61,52 @@ namespace Application.Services
 
         public async Task<AttendanceOverviewDto> GetAttendanceOverviewAsync(int month, int year)
         {
-            var activeEmployees = (await _employeeRepository.GetAllAsync(1, 100000, null, null)).Where(e => e.IsActive).ToList();
+            var activeEmployees = (await _employeeRepository.GetAllAsync(1, int.MaxValue, null, null))
+                .Where(e => e.IsActive).ToList();
+            int activeCount = activeEmployees.Count;
+
             var allAtt = await _attendanceRepository.GetMonthlyAllAsync(month, year);
-            // For efficiency, avoiding memory fetch of everything. Since no get-all by month exists, we will compute a basic version
-            var daysInMonth = DateTime.DaysInMonth(year, month);
             
-            return new AttendanceOverviewDto
+            // Calculate actual working days (Mon-Fri)
+            int totalWorkingDays = 0;
+            int daysInMonth = DateTime.DaysInMonth(year, month);
+            for (int day = 1; day <= daysInMonth; day++)
+            {
+                var date = new DateTime(year, month, day);
+                if (date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
+                {
+                    totalWorkingDays++;
+                }
+            }
+
+            var dto = new AttendanceOverviewDto
             {
                 Month = month,
                 Year = year,
-                TotalWorkingDays = daysInMonth, // approximation
-                AveragePresentDays = 0, // In full implementation, aggregate by employee
-                AverageAbsentDays = 0,
-                LateCheckInCount = 0,
-                MissedCheckoutCount = 0,
-                DepartmentWiseAttendance = new() // Populate via aggregation
+                TotalWorkingDays = totalWorkingDays,
+                AveragePresentDays = activeCount > 0 ? (double)allAtt.Count(a => a.Status == "Present" || a.Status == "HalfDay") / activeCount : 0,
+                AverageAbsentDays = activeCount > 0 ? (double)allAtt.Count(a => a.Status == "Absent") / activeCount : 0,
+                LateCheckInCount = allAtt.Count(a => a.AttendanceLogs.Any(l => l.CheckIn.TimeOfDay > new TimeSpan(9, 30, 0))), // 9:30 AM policy
+                MissedCheckoutCount = allAtt.Count(a => a.AttendanceLogs.Any(l => l.CheckOut == null)),
             };
+
+            // Department-wise stats
+            var deptGroups = allAtt.GroupBy(a => a.Employee.Department?.DepartmentName ?? "Unknown");
+            foreach (var group in deptGroups)
+            {
+                int present = group.Count(a => a.Status == "Present" || a.Status == "HalfDay");
+                int total = group.Count();
+
+                dto.DepartmentWiseAttendance.Add(new DepartmentAttendanceDto
+                {
+                    DepartmentName = group.Key,
+                    PresentCount = present,
+                    AbsentCount = group.Count(a => a.Status == "Absent"),
+                    PresentPercent = total > 0 ? (double)present / total * 100 : 0
+                });
+            }
+
+            return dto;
         }
 
         public async Task<DepartmentStatsDto> GetDepartmentStatsAsync()
@@ -134,19 +164,35 @@ namespace Application.Services
 
         public async Task<SalaryStatsDto> GetSalaryStatsAsync(int year)
         {
-            // For proper implementation, we require a repo method to get all salaries for a year
-            // As a placeholder for exactly what we need without modifying repos:
+            var yearlySalaries = await _salaryRepository.GetYearlyAllAsync(year);
             
             var dto = new SalaryStatsDto
             {
                 Year = year,
-                TotalAnnualExpenditure = 0,
-                AverageMonthlySalary = 0,
-                HighestSalary = 0,
-                LowestSalary = 0
+                TotalAnnualExpenditure = yearlySalaries.Sum(s => s.NetSalary),
+                AverageMonthlySalary = yearlySalaries.Any() ? yearlySalaries.Average(s => s.NetSalary) : 0,
+                HighestSalary = yearlySalaries.Any() ? yearlySalaries.Max(s => s.NetSalary) : 0,
+                LowestSalary = yearlySalaries.Any() ? yearlySalaries.Min(s => s.NetSalary) : 0
             };
 
-            return await Task.FromResult(dto);
+            // Department-wise stats
+            var deptGroups = yearlySalaries.GroupBy(s => s.Employee.Department?.DepartmentName ?? "Unknown");
+            foreach (var group in deptGroups)
+            {
+                decimal totalExpenditure = group.Sum(s => s.NetSalary);
+                decimal avgSalary = group.Average(s => s.NetSalary);
+
+                dto.DepartmentWiseSalary.Add(new DepartmentSalaryDto
+                {
+                    DepartmentName = group.Key,
+                    TotalExpenditure = totalExpenditure,
+                    AverageSalary = avgSalary,
+                    TotalSalary = totalExpenditure, // compatibility with existing DTO property
+                    AvgSalary = avgSalary           // compatibility with existing DTO property
+                });
+            }
+
+            return dto;
         }
     }
 }

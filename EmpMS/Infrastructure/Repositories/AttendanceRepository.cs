@@ -23,6 +23,7 @@ namespace Infrastructure.Repositories
             return await _appDbContext.Attendances
                 .Include(a => a.AttendanceLogs)
                 .Include(a => a.Employee)
+                    .ThenInclude(e => e.Department)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(a => a.EmployeeId == empId && a.Date == date);
         }
@@ -31,6 +32,7 @@ namespace Infrastructure.Repositories
             return await _appDbContext.Attendances
                 .Include(a => a.AttendanceLogs)
                 .Include(a => a.Employee)
+                    .ThenInclude(e => e.Department)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
@@ -40,6 +42,7 @@ namespace Infrastructure.Repositories
             return await _appDbContext.Attendances
                 .Include(a => a.AttendanceLogs)
                 .Include(a => a.Employee)
+                    .ThenInclude(e => e.Department)
                 .Where(a => a.EmployeeId == empId && a.Date.Month == month && a.Date.Year == year)
                 .OrderByDescending(a => a.Date)
                 .AsNoTracking()
@@ -50,6 +53,7 @@ namespace Infrastructure.Repositories
             return await _appDbContext.Attendances
                 .Include(a => a.AttendanceLogs)
                 .Include(a => a.Employee)
+                    .ThenInclude(e => e.Department)
                 .Where(a => a.Employee.DepartmentId == deptId && a.Date == date)
                 .AsNoTracking()
                 .ToListAsync();
@@ -59,6 +63,7 @@ namespace Infrastructure.Repositories
             return await _appDbContext.Attendances
                 .Include(a => a.AttendanceLogs)
                 .Include(a => a.Employee)
+                    .ThenInclude(e => e.Department)
                 .Where(a => a.Date == today)
                 .AsNoTracking()
                 .ToListAsync();
@@ -68,6 +73,7 @@ namespace Infrastructure.Repositories
             return await _appDbContext.Attendances
                 .Include(a => a.AttendanceLogs)
                 .Include(a => a.Employee)
+                    .ThenInclude(e => e.Department)
                 .Where(a => a.Date.Month == month && a.Date.Year == year)
                 .AsNoTracking()
                 .ToListAsync();
@@ -107,6 +113,7 @@ namespace Infrastructure.Repositories
             return await _appDbContext.Attendances
                 .Include(a => a.AttendanceLogs)
                 .Include(a => a.Employee)
+                    .ThenInclude(e => e.Department)
                 .Where(a => a.EmployeeId == employeeId
                        && a.Date < today   // exclude today — employee is still working!
                        && a.AttendanceLogs.Any(l => l.CheckOut == null))
