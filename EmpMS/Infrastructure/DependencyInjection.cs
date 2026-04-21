@@ -34,6 +34,7 @@ namespace Infrastructure
             services.AddScoped<ISalaryStructureRepository, SalaryStructureRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IPerformanceReviewRepository, PerformanceReviewRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
 
             services.AddScoped<IEmailService, EmailService>();
 
