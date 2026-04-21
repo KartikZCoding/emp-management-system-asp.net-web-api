@@ -30,7 +30,7 @@ namespace EmpMS.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse<ReviewResponseDto>>> CreateReview(CreateReviewDto dto)
         {
-            var reviewerId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var reviewerId = Convert.ToInt32(User.FindFirst("EmployeeId")?.Value);
             var username = User.FindFirst(ClaimTypes.Name)?.Value ?? "System";
 
             var response = await _reviewService.CreateReviewAsync(dto, reviewerId, username);

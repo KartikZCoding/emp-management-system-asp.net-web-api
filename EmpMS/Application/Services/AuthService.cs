@@ -134,7 +134,7 @@ namespace Application.Services
             var permissions = await _authRepository.GetUserPermissionsAsync(user.Id);
 
             // 4. Generate new tokens (token rotation)
-            string accessToken = _jwtHelper.GenerateToken(user.Id, user.Username, user.Email, permissions);
+            string accessToken = _jwtHelper.GenerateToken(user.Id, user.Username, user.Email, user.EmployeeId, permissions);
             string refreshToken = _jwtHelper.GenerateRefreshToken();
 
             //save refresh token to DB
@@ -177,13 +177,14 @@ namespace Application.Services
             var permissions = await _authRepository.GetUserPermissionsAsync(userId);
 
             // 4. Generate new tokens (token rotation)
-            string newAccessToken = _jwtHelper.GenerateToken(user.Id, user.Username, user.Email, permissions);
+            string newAccessToken = _jwtHelper.GenerateToken(user.Id, user.Username, user.Email, user.EmployeeId, permissions);
             string newRefreshToken = _jwtHelper.GenerateRefreshToken();
 
             // 5. Save new refresh token (invalidates old one)
             user.RefreshToken = newRefreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             await _authRepository.UpdateUserAsync(user);
+            await _unitOfWork.SaveChangesAsync();
 
             return new LoginResponseDto
             {
@@ -237,6 +238,7 @@ namespace Application.Services
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(resetPasswordDto.NewPassword);
 
             await _authRepository.UpdateUserAsync(user);
+            await _unitOfWork.SaveChangesAsync();
             _cache.Remove(resetPasswordDto.Email);
         }
 
@@ -254,7 +256,7 @@ namespace Application.Services
             user.MustChangePassword = false;
 
             await _authRepository.UpdateUserAsync(user);
-
+            await _unitOfWork.SaveChangesAsync();
         }
 
         /* Don't used */

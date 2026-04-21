@@ -29,7 +29,7 @@ namespace Infrastructure.Services
             _publicKey = new RsaSecurityKey(publicRsa);
         }
 
-        public string GenerateToken(int userId, string username, string email, List<string> permissions)
+        public string GenerateToken(int userId, string username, string email, int? employeeId, List<string> permissions)
         {
             var claims = new List<Claim>
             {
@@ -37,6 +37,11 @@ namespace Infrastructure.Services
                new Claim(ClaimTypes.Name, username),
                new Claim(ClaimTypes.Email, email),
             };
+
+            if (employeeId.HasValue)
+            {
+                claims.Add(new Claim("EmployeeId", employeeId.Value.ToString()));
+            }
 
             // Add each permission as a separate claim
             foreach (var permission in permissions)
