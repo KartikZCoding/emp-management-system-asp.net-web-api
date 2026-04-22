@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="Application/Application.csproj" Id="b569f408-1c77-4486-b1f0-d8cf95b0fa02" />
   <Project Path="Domain/Domain.csproj" Id="9b38751d-da0a-4842-99b6-43de3be35658" />
+  <Project Path="EmpMS.Tests/EmpMS.Tests.csproj" />
   <Project Path="EmpMS/EmpMS.csproj" Id="7eb779b8-b14f-43b5-bebb-67ec62342ad8" />
   <Project Path="Infrastructure/Infrastructure.csproj" Id="19865443-64d8-4261-9694-d58e41783887" />
 </Solution>
